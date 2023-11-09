@@ -7,11 +7,11 @@ info32
 
 #create new data with only a few columns of info32 dataset
 dataHyp1Sub <- info32[,c('Goal_USD','Pledge_USD','Launched_at','Deadline', 'Creator_nb_projects', 'Creator_nb_backed')]
-dataHyp1Sub
+#dataHyp1Sub
 
 #make a subdataset where deadline is before week 32 in 2019 in unix time
 dataHyp1 <- dataHyp1Sub[dataHyp1Sub$Deadline < 1565474400,]
-dataHyp1
+#dataHyp1
 
 #You drop only 1850 records out of 75000
 
@@ -22,7 +22,7 @@ nrow(dataHyp1)
 
 #make a new column with boolean if goal_USD >= Pledge_USD
 dataHyp1$Goal_met <- dataHyp1$Goal_USD <= dataHyp1$Pledge_USD
-dataHyp1
+#dataHyp1
 
 #Get from Creator_nb_backed only the number with a regex
 dataHyp1$Creator_nb_backed <- as.integer(gsub("[^0-9]", "", dataHyp1$Creator_nb_backed))
@@ -30,30 +30,41 @@ dataHyp1$Creator_nb_backed <- as.integer(gsub("[^0-9]", "", dataHyp1$Creator_nb_
 #drop na values in dataHyp1
 dataHyp1 <- dataHyp1[complete.cases(dataHyp1),]
 dataHyp1 <- dataHyp1[,c('Creator_nb_projects', 'Creator_nb_backed', 'Goal_met')]
-dataHyp1
+#dataHyp1
 
 
 #change Goal_met to binary
 dataHyp1$Goal_met <- as.integer(dataHyp1$Goal_met)
-dataHyp1
+#dataHyp1
 
 
 #Columns as integers
 dataHyp1$Creator_nb_backed <- as.integer(dataHyp1$Creator_nb_backed)
-dataHyp1$Creator_nb_projects <- as.integer(dataHyp1$Creator_nb_projects)
 
 
-#make a linear model to predict Goal_met with Creator_nb_projects and Creator_nb_backed
-modelHyp1 <- lm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1)
-summary(modelHyp1)
+#to find an appropriate cutoff point:
+table(dataHyp1$Creator_nb_projects)
 
-#make a table of the coefficients of the model
-
-
+# we will only use values with at least 50 records, because for normal distribution you need a minimum of 50 values
+# So then you have an substantial amount of values
 
 
-dataHyp1
+#iterate over the values of the following table: table(dataHyp1$Creator_nb_projects)
+quan_table = table(dataHyp1$Creator_nb_projects)
 
+#in quan_table, drop the records where the value is < 50
+quan_table <- quan_table[quan_table >= 50]
+
+#clean the data such that only records with over 50 occurences are in there
+dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_projects %in% names(quan_table),]
+
+#make a table of the values of Creator_nb_projects
+table(dataHyp1_2$Creator_nb_projects)
+
+
+#make a logreg model to predict goal_met with Creator_nb_projects and Creator_nb_backed
+modelHyp1Log <- glm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2, family = "binomial")
+summary(modelHyp1Log)
 
 #Perform anova test on dataHyp1
 anova(modelHyp1)
@@ -86,8 +97,6 @@ barplot(tableHyp1$vec_amount, names.arg = tableHyp1$vec_ind, xlab = "Number of p
 #drop columns where nan exists
 tableHyp1 <- tableHyp1[complete.cases(tableHyp1),]
 tableHyp1
-
-
 
 
 #make a barchart of tableHyp1
