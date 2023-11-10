@@ -31,6 +31,8 @@ dataHyp1 <- dataHyp1[dataHyp1$Goal_USD != 0,]
 #Create a new column with percentage of goal reached
 dataHyp1$Goal_percentage <- dataHyp1$Pledge_USD/dataHyp1$Goal_USD
 dataHyp1$Goal_percentage <- round(dataHyp1$Goal_percentage, digits = 3)
+dataHyp1$Goal_percentage[dataHyp1$Goal_percentage>100] = 100
+print(dataHyp1$Goal_percentage)
 #dataHyp1
 
 #Get from Creator_nb_backed only the number with a regex
@@ -79,16 +81,20 @@ summary(dataHyp1_2)
 
 #Create a linear model that predicts Goal_percentage with Creator_nb_projects and Creator_nb_backed
 modelHyp1 <- lm(Goal_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2)
-
 modelHyp1
+summary(modelHyp1)
+
+#Trying some transformations on the data since the qqplot is not normally distributed (No success)
+y<-sqrt(log(dataHyp1_2$Goal_percentage+1))
+print(y)
+qqnorm(y)
+qqline(y)
 
 #Perform anova test on dataHyp1
 anova(modelHyp1)
 
 #visualize the model
 plot(modelHyp1) #-> from this you get the QQ test and stuff. The bookcamp shizzle to check whether the model is correct
-
-summary(modelHyp1)
 
 
 
