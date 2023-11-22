@@ -1,5 +1,5 @@
 # Install and load required packages
-install.packages(c("tidytext", "dplyr", "ggplot2"))
+# install.packages(c("tidytext", "dplyr", "ggplot2"))
 library(tidytext)
 library(dplyr)
 library(ggplot2)
@@ -33,6 +33,7 @@ dataHyp2 <- dataHyp2 %>%
   group_by(creator_slug) %>%
   mutate(Order = row_number())
 
+dataHyp2$duration <- as.numeric(dataHyp2$Deadline) - as.numeric(dataHyp2$Launched_at)
 
 # Define the vector of words
 word_dict <- c(
@@ -196,15 +197,43 @@ for (i in 1:nrow(dataHyp2)) {
 
 dataHyp2$innovation <- innovation_ratios
 
-#### make a 
+#### make a lm
+mod0 <- lm(innovation ~ Order, data=dataHyp2)
+mod1 <- lm(innovation ~ Goal_USD, data=dataHyp2)
+mod2 <- lm(innovation ~ duration, data=dataHyp2)
 
+modA <- lm(innovation ~ Order + Goal_USD + duration, data=dataHyp2)
 
+summary(mod0)
+summary(mod1)
+summary(mod2)
+summary(modA)
 
 #### make graph of innovation across different orders
 
-#This is not a good plot, because we're aggregating. We should look at each creator individually.Ï
-ggplot(dataHyp2, aes(x = Order, y = innovation)) +
+dataHyp2 <- dataHyp2 %>%
+  arrange(creator_slug, Order) %>%  # Sort the dataframe by 'id' and 'order'
+  group_by(creator_slug) %>%
+  mutate(change = innovation - lag(innovation, default = first(innovation)))
+
+dataHyp2 %>% ggplot(aes(x=factor(Order), y=change)) +
+                      geom_boxplot() +
+                      geom_line(stat="summary", fun="mean", aes(group=1, y=innovation), color="red", size=1) +
+                      labs(title="Change innovation over time",
+                           x="Time",
+                           y="Change in innovation compared to time-1")
+
+ggplot(dataHyp2, aes(x = Order, y = change)) +
   geom_bar(stat = "summary", fun = "mean", position = "dodge") +
   labs(title = "Mean innovation by Order", x = "Order", y = "Innovation")
 
+dataHyp2 %>% ggplot(aes(x=factor(Order), y=innovation)) +
+  geom_boxplot() +
+  labs(title="Change innovation over time",
+       x="Time",
+       y="Change in innovation compared to time-1")
+
+ggplot(dataHyp2, aes(x = Order, y = innovation)) +
+  geom_bar(stat = "summary", fun = "mean", position = "dodge") +
+  labs(title = "Mean innovation by Order", x = "Order", y = "Innovation")
 
