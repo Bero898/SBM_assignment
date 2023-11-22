@@ -195,19 +195,27 @@ for (i in 1:nrow(dataHyp2)) {
   innovation_ratios[i] <- innovation_counter/stringr::str_count(dataHyp2$Project_description[i], ' ')
 }
 
-dataHyp2$innovation <- innovation_ratios
+dataHyp2$innovation <- innovation_ratios * 1000
+
+dataHyp2$orderFactor <- as.factor(dataHyp2$Order)
 
 #### make a lm
 mod0 <- lm(innovation ~ Order, data=dataHyp2)
-mod1 <- lm(innovation ~ Goal_USD, data=dataHyp2)
-mod2 <- lm(innovation ~ duration, data=dataHyp2)
+mod1 <- lm(innovation ~ orderFactor, data=dataHyp2)
+mod2 <- lm(innovation ~ Goal_USD, data=dataHyp2)
+mod3 <- lm(innovation ~ duration, data=dataHyp2)
 
 modA <- lm(innovation ~ Order + Goal_USD + duration, data=dataHyp2)
+modB <- lm(innovation ~ orderFactor + Goal_USD + duration, data=dataHyp2)
 
 summary(mod0)
 summary(mod1)
 summary(mod2)
+summary(mod3)
 summary(modA)
+summary(modB)
+
+texreg::screenreg(list(mod0, mod1, mod2, mod3, modA, modB))
 
 #### make graph of innovation across different orders
 
