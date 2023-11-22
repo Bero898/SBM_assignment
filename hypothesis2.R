@@ -199,23 +199,39 @@ dataHyp2$innovation <- innovation_ratios * 1000
 
 dataHyp2$orderFactor <- as.factor(dataHyp2$Order)
 
+dataHyp2 <- dataHyp2 %>%
+  arrange(creator_slug, Order) %>%  # Sort the dataframe by 'id' and 'order'
+  group_by(creator_slug) %>%
+  mutate(previousSuccess = lag(success_rate, default = 1))
+
 #### make a lm
 mod0 <- lm(innovation ~ Order, data=dataHyp2)
 mod1 <- lm(innovation ~ orderFactor, data=dataHyp2)
 mod2 <- lm(innovation ~ Goal_USD, data=dataHyp2)
 mod3 <- lm(innovation ~ duration, data=dataHyp2)
+mod4 <- lm(innovation ~ previousSuccess, data=dataHyp2)
 
 modA <- lm(innovation ~ Order + Goal_USD + duration, data=dataHyp2)
 modB <- lm(innovation ~ orderFactor + Goal_USD + duration, data=dataHyp2)
+modC <- lm(innovation ~ Order + Goal_USD + duration + previousSuccess, data=dataHyp2)
+modD <- lm(innovation ~ orderFactor + Goal_USD + duration + previousSuccess, data=dataHyp2)
+modE <- lm(innovation ~ Order + Goal_USD + duration + previousSuccess + previousSuccess * Order, data=dataHyp2)
+modF <- lm(innovation ~ orderFactor + Goal_USD + duration + previousSuccess * orderFactor, data=dataHyp2)
 
 summary(mod0)
 summary(mod1)
 summary(mod2)
 summary(mod3)
+summary(mod4)
 summary(modA)
 summary(modB)
+summary(modC)
+summary(modD)
+summary(modE)
+summary(modF)
 
-texreg::screenreg(list(mod0, mod1, mod2, mod3, modA, modB))
+texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, modA, modB, modC, modD, modE, modF))
+texreg::screenreg(list(mod0, mod2, mod3, mod4, modA, modC, modE))
 
 #### make graph of innovation across different orders
 
@@ -245,3 +261,9 @@ ggplot(dataHyp2, aes(x = Order, y = innovation)) +
   geom_bar(stat = "summary", fun = "mean", position = "dodge") +
   labs(title = "Mean innovation by Order", x = "Order", y = "Innovation")
 
+pval_data <- data.frame(x=1:51, y=c(0.558542,0.000444,0.001761,0.019599,0.060136,0.280711,0.019939,0.628639,0.053100,0.031022,0.124358,0.132697,0.041261,0.044061,0.015593,0.042814,0.043052,0.023550,0.207842,0.037092,0.063320,0.062987,0.093064,0.090276,0.157054,0.154718,0.186388,0.167106,0.306590,0.264606,0.243928,0.393743,0.370298,0.382906,0.378965,0.309810,0.441284,0.441284,0.441284,0.441284,0.441284,0.441284,0.441284,0.441284,0.441284,0.441284,0.441284,0.441284,0.441284,0.441284,0.441284))
+
+ggplot(pval_data, aes(x=x, y=y)) +
+  geom_point() +
+  geom_hline(yintercept=0.05, color='red') +
+  labs(title="P-value for the project per creator", x="number of previous projects", y="p-value")
