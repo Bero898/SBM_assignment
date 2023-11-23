@@ -12,7 +12,7 @@ info <- readRDS(info_filename)
 #create a dataset with only creator_slug that appear more than once in the dataset
 dataHyp2Double <- info[info$creator_slug %in% names(which(table(info$creator_slug) > 1)),]
 
-dataHyp2sub<- dataHyp2Double[,c('creator_slug','Goal_USD','Pledge_USD','Launched_at','Deadline','Project_description','Creator_nb_projects','Creator_nb_backed')]
+dataHyp2sub<- dataHyp2Double[,c('creator_slug','Goal_USD','Pledge_USD','Launched_at','Deadline','Project_description','Creator_nb_projects','Creator_nb_backed', 'Category')]
 
 dataHyp2filtered <- na.omit(dataHyp2sub)
 
@@ -21,10 +21,11 @@ dataHyp2 <- dataHyp2filtered[dataHyp2filtered$Deadline < 1565474400,]
 
 
 #make a new column with boolean if goal_USD >= Pledge_USD
-dataHyp2$Pledge_USD <- as.numeric(dataHyp2$Pledge_USD)
-dataHyp2$Goal_USD <- as.numeric(dataHyp2$Goal_USD)
+dataHyp2$Pledge_USD <- log(as.numeric(dataHyp2$Pledge_USD) + 1)
+dataHyp2$Goal_USD <- log(as.numeric(dataHyp2$Goal_USD) + 1)
 dataHyp2$success_rate <- dataHyp2$Pledge_USD / dataHyp2$Goal_USD
 
+dataHyp2 <- subset(dataHyp2, is.finite(dataHyp2$Pledge_USD) & is.finite(dataHyp2$Goal_USD) & is.finite(dataHyp2$success_rate))
 
 # make a new column with order which orders the projects per creator_slug based on launched_at.
 # So the first project of a creator should get 1, the second 2 ..
@@ -210,6 +211,7 @@ mod1 <- lm(innovation ~ orderFactor, data=dataHyp2)
 mod2 <- lm(innovation ~ Goal_USD, data=dataHyp2)
 mod3 <- lm(innovation ~ duration, data=dataHyp2)
 mod4 <- lm(innovation ~ previousSuccess, data=dataHyp2)
+mod5 <- lm(innovation ~ Category, data=dataHyp2)
 
 modA <- lm(innovation ~ Order + Goal_USD + duration, data=dataHyp2)
 modB <- lm(innovation ~ orderFactor + Goal_USD + duration, data=dataHyp2)
@@ -223,6 +225,7 @@ summary(mod1)
 summary(mod2)
 summary(mod3)
 summary(mod4)
+summary(mod5)
 summary(modA)
 summary(modB)
 summary(modC)
@@ -230,7 +233,7 @@ summary(modD)
 summary(modE)
 summary(modF)
 
-texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, modA, modB, modC, modD, modE, modF))
+texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, mod5, modA, modB, modC, modD, modE, modF))
 texreg::screenreg(list(mod0, mod2, mod3, mod4, modA, modC, modE))
 
 #### make graph of innovation across different orders
