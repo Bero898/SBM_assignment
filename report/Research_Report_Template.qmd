@@ -1,0 +1,29 @@
+
+---
+title: "Research Report"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# Introduction
+
+Introduce the topic, explain why it is interesting (the research gap and the practical relevance), and formulate the research question.
+
+# Theory and Hypotheses
+
+Explain the state of art in the relevant literature, building towards what is it exactly that you would like to research, consistent with your research question and research gap. If your research design allows for it, develop at most 3 hypotheses based on the theoretical framework you covered: what is it that you expect to see in the data, and why?
+
+# Methods and Data
+
+Describe the data set that you used, the way you translated the raw data into variables, and the methods you used to analyze the data (e.g., cluster analysis, regression analysis, panel data analysis, time series). Remember that most methods have a number of assumptions that you have to check prior to doing the analyses. Certain assumption violations can be fixed by transforming the focal variables, e.g., the dependent variable, in case of other violations you may need to choose a different method.
+
+# Results
+
+Present the results of your analyses including descriptive statistics, regression tables, as well as any possible figures or visualizations that you made, e.g., those of the interaction effects.
+
+# Discussion
+
+What did we learn from what you found in your results, how do those findings relate to the ongoing debate in literature, and what can practitioners learn from that?
