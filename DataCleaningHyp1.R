@@ -62,6 +62,8 @@ dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_projects %in% names(quan_table),]
 table(dataHyp1_2$Creator_nb_projects)
 
 
+
+
 #make a logreg model to predict goal_met with Creator_nb_projects and Creator_nb_backed
 modelHyp1Log <- glm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2, family = "binomial")
 summary(modelHyp1Log)

@@ -3,6 +3,7 @@ title: "SBM Report Group 4"
 format: html
 editor: visual
 author: "Bram, Diego, Roland, Thomas, Borná"
+bibliography: references.bib
 ---
 
 # Report SBM Group 4
@@ -15,6 +16,12 @@ Introduce the topic, explain why it is interesting (the research gap and the pra
 
 Explain the state of art in the relevant literature, building towards what is it exactly that you would like to research, consistent with your research question and research gap. If your research design allows for it, develop at most 3 hypotheses based on the theoretical framework you covered: what is it that you expect to see in the data, and why?
 
+### Assumptions
+
+We assume that an entrepreneur does not have any prior experience. We assume that the data is sufficient. For a proxy of successrate, we use the funding as a measure. We assume that the funding is a good proxy for success, because if the funding is not met, the project will not be realized. We assume that the data is not biased, because the data is collected by a third party. We assume that the data is not biased, because the data is collected by a third party. We assume that innovation-related words can also be taken as meaning innovation. By expanding the bucket of words referring to innovation we assure that the majority of the words related to innovation are covered.
+
+We do not assume that employees influence business results, as we are taking a look at Kickstarter projects. And start-up culture is not the same as corporate culture. We do not assume that the number of employees is a good proxy for experience, because the number of employees does not say anything about the experience of the employees [@martin2010].
+
 ### Research Question 1
 
 How does experience impact the success rate?
@@ -23,17 +30,28 @@ Hypothesis 1: Experience will have a positive impact on whether the idea is succ
 
 ### Research Question 2
 
-How do business ideas change after experience? Hypothesis 2:
+How do business ideas change after experience?
+
+Hypothesis 2: subsequent ideas are more innovative than the first idea.
 
 ## Methods and Data
 
 Describe the data set that you used, the way you translated the raw data into variables, and the methods you used to analyze the data (e.g., cluster analysis, regression analysis, panel data analysis, time series). Remember that most methods have a number of assumptions that you have to check prior to doing the analyses. Certain assumption violations can be fixed by transforming the focal variables, e.g., the dependent variable, in case of other violations you may need to choose a different method.
 
+```{r}
+getwd()
+setwd("C:/Users/Borna/Documents/Study/Masters/Master A/Strategy and Business Models/SBM_assignment/report")
+getwd()
+```
+
 ### Data Importing and cleaning, hypothesis 1
 
 ```{r}
 #inspect the data
-info32
+#load .rds file named "info" into rstudio
+
+
+info32 <- readRDS("info.rds")
 
 #create new data with only a few columns of info32 dataset
 dataHyp1Sub <- info32[,c('Goal_USD','Pledge_USD','Launched_at','Deadline', 'Creator_nb_projects', 'Creator_nb_backed')]
@@ -98,13 +116,23 @@ table(dataHyp1_2$Creator_nb_projects)
 ### Anova test, hypothesis 1
 
 ```{r}
+#make a reg model to predict goal_met with Creator_nb_projects and Creator_nb_backed
+modelHyp1 <- lm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2)
+
 #make a logreg model to predict goal_met with Creator_nb_projects and Creator_nb_backed
 modelHyp1Log <- glm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2, family = "binomial")
 summary(modelHyp1Log)
 
-#Perform anova test on dataHyp1
-anova(modelHyp1)
 
+
+#Perform anova test on dataHyp1
+
+Anova_normal <- anova(modelHyp1)
+Anova_log <- anova(modelHyp1Log)
+
+stargazer::stargazer(list(Anova_normal, Anova_log), type = 'text')
+
+#table output both Anova_normal and Anova_log inline using stargazer
 ```
 
 ### Some more cleaning and barplot creation
@@ -125,23 +153,49 @@ for (i in 1:as.integer(max(dataHyp1$Creator_nb_projects))){
 tableHyp1 <- data.frame(vec_ind, vec_val, vec_amount)
 tableHyp1
 
+
+
+```
+
+```{r}
 #make a barplot of the column vec_amount
 barplot(tableHyp1$vec_amount, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Number of projects of the creator", main = "Number of projects of the creator by number of projects of the creator")
+
+```
+
+```{r}
 
 
 #drop columns where nan exists
 tableHyp1 <- tableHyp1[complete.cases(tableHyp1),]
-tableHyp1
+# tableHyp1
 
 
 #make a barchart of tableHyp1
 barplot(tableHyp1$vec_val, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Percentage of projects that met their goal", main = "Percentage of projects that met their goal by number of projects of the creator")
 
+
+```
+
+```{r}
 #make a barchart of the number of projects per number of projects
 barplot(tableHyp1$vec_amount, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Number of projects of the creator", main = "Number of projects of the creator by number of projects of the creator")
 
 
-barplot(dataHyp1$Creator_nb_projects,  names.arg = tableHyp1$vec_ind, xlab = "x", ylab = "y", main = "title")
+```
+
+```{r}
+
+# Convert the data to numeric if needed
+dataHyp1$Creator_nb_projects <- as.numeric(dataHyp1$Creator_nb_projects)
+
+# Check if 'tableHyp1$vec_ind' is numeric or convert it
+tableHyp1$vec_ind <- as.numeric(tableHyp1$vec_ind)
+
+# Now, create the barplot
+barplot(dataHyp1$Creator_nb_projects, names.arg = tableHyp1$vec_ind, xlab = "x", ylab = "y", main = "title")
+
+#this code raises an error. 
 
 
 ```
