@@ -219,6 +219,11 @@ modC <- lm(innovation ~ Order + Goal_USD + duration + previousSuccess, data=data
 modD <- lm(innovation ~ orderFactor + Goal_USD + duration + previousSuccess, data=dataHyp2)
 modE <- lm(innovation ~ Order + Goal_USD + duration + previousSuccess + previousSuccess * Order, data=dataHyp2)
 modF <- lm(innovation ~ orderFactor + Goal_USD + duration + previousSuccess * orderFactor, data=dataHyp2)
+modG <- lm(innovation ~ Order + Goal_USD + duration + previousSuccess + previousSuccess * Order + Category, data=dataHyp2)
+modH <- lm(innovation ~ orderFactor + Goal_USD + duration + previousSuccess * orderFactor + Category, data=dataHyp2)
+
+texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, mod5, modA, modB, modC, modD, modE, modF, modG, modH))
+texreg::screenreg(list(mod0, mod2, mod3, mod4, modA, modC, modE))
 
 summary(mod0)
 summary(mod1)
@@ -232,9 +237,8 @@ summary(modC)
 summary(modD)
 summary(modE)
 summary(modF)
-
-texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, mod5, modA, modB, modC, modD, modE, modF))
-texreg::screenreg(list(mod0, mod2, mod3, mod4, modA, modC, modE))
+summary(modG)
+summary(modH)
 
 #### make graph of innovation across different orders
 
@@ -270,3 +274,39 @@ ggplot(pval_data, aes(x=x, y=y)) +
   geom_point() +
   geom_hline(yintercept=0.05, color='red') +
   labs(title="P-value for the project per creator", x="number of previous projects", y="p-value")
+
+
+
+
+
+
+
+
+
+dataHyp2 <- dataHyp2 %>%
+  arrange(creator_slug, Order) %>%  # Sort the dataframe by 'id' and 'order'
+  group_by(creator_slug) %>%
+  mutate(change = innovation - lag(innovation, default = first(innovation)))
+
+dataHyp2 %>% ggplot(aes(x=factor(Order), y=change)) +
+  geom_boxplot() +
+  geom_line(stat="summary", fun="mean", aes(group=1, y=innovation), color="red", size=1) +
+  labs(title="Change in innovation for number of projects",
+       x="Number of projects",
+       y="Change in innovation compared to time-1")
+
+ggplot(dataHyp2, aes(x = Order, y = change)) +
+  geom_bar(stat = "summary", fun = "mean", position = "dodge") +
+  labs(title = "Mean change in innovation for number of projects", x = "Number of projects", y = "Innovation")
+
+dataHyp2 %>% ggplot(aes(x=factor(Order), y=innovation)) +
+  geom_boxplot() +
+  labs(title="Innovation for number of projects",
+       x="Number of projects",
+       y="Innovation")
+
+ggplot(dataHyp2, aes(x = Order, y = innovation)) +
+  geom_bar(stat = "summary", fun = "mean", position = "dodge") +
+  labs(title = "Mean innovation for number of projects", x = "Number of projects", y = "Innovation")
+
+plot(dataHyp2$duration, dataHyp2$innovation)
