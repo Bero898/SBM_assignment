@@ -85,15 +85,46 @@ dataHyp1_2 <- dataHyp1_2[complete.cases(dataHyp1_2),]
 #give summary statistics of dataHyp1_2
 summary(dataHyp1_2)
 
+##check the distribution of the outcome variable
+hist(x)
+table(x)
+#looks exponential, so we try log transform
+y<-log(dataHyp1_2$Goal_percentage+1)
+qqnorm(y)
+qqline(y)
+#still skewed, so we try to include sqrt transform
+y<-sqrt(log(dataHyp1_2$Goal_percentage+1))
+qqnorm(y)
+qqline(y)
+
+##since there is no improvement, and the distribution seems exponential, we use
+##poisson distribution
+
+modelPoisson <- glm(Goal_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = "log"))
+summary(modelPoisson)
+
+# trying zero inflation model
+##can't use factors, need to one hot encode
+
+hot_encode <- model.matrix(~  Creator_nb_projects + Creator_nb_backed  - 1, data = dataHyp1_2)
+
+hot_encode<-as.data.frame(hot_encode)
+
+
+inflDS <- cbind(dataHyp1_2$Goal_percentage, hot_encode)
+inflDS$`dataHyp1_2$Goal_percentage`<- inflDS$`dataHyp1_2$Goal_percentage`
+
+
+print(inflDS)
+
+modelZeroINFL <- pscl::zeroinfl(`dataHyp1_2$Goal_percentage` ~ . | ., dist = "negbin", data = inflDS)
+
+summary(modelZeroINFL)
+
 #Create a linear model that predicts Goal_percentage with Creator_nb_projects and Creator_nb_backed
 modelHyp1 <- lm(Goal_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2)
 
 summary(modelHyp1)
-
-y<-sqrt(log(dataHyp1_2$Goal_percentage+1))
-print(y)
-qqnorm(y)
-qqline(y)
 
 #Perform anova test on dataHyp1
 anova(modelHyp1)

@@ -14,7 +14,7 @@ Introduce the topic, explain why it is interesting (the research gap and the pra
 
 ## Theory and Hypotheses
 
-Explain the state of art in the relevant literature, building towards what is it exactly that you would like to research, consistent with your research question and research gap. If your research design allows for it, develop at most 3 hypotheses based on the theoretical framework you covered: what is it that you expect to see in the data, and why?
+Explain the state of art in the relevant literature, building towards what is it exactly that you would like to research, consistent with your research question and research gap. If your research design allows for it, develop at most 3 hypotheses based on the theoretical framework you covered: what is it that you expect to see in the data, and why? (Include Behavioral Theory of the Firm).
 
 ### Assumptions
 
@@ -46,6 +46,8 @@ getwd()
 
 ### Data Importing and cleaning, hypothesis 1
 
+In order to test the first hypothesis it is necessary to first clean the data.
+
 ```{r}
 #inspect the data
 #load .rds file named "info" into rstudio
@@ -67,70 +69,137 @@ dataHyp1 <- dataHyp1Sub[dataHyp1Sub$Deadline < 1565474400,]
 nrow(dataHyp1Sub)
 nrow(dataHyp1)
 
+#columns to integer
+dataHyp1$Pledge_USD <- as.integer(dataHyp1$Pledge_USD)
+dataHyp1$Goal_USD <- as.integer(dataHyp1$Goal_USD)
 
-#make a new column with boolean if goal_USD >= Pledge_USD
-dataHyp1$Goal_met <- dataHyp1$Goal_USD <= dataHyp1$Pledge_USD
+#drop the rows where Goal_USD is 0 -> then you might get inf percentage
+dataHyp1 <- dataHyp1[dataHyp1$Goal_USD != 0,]
+#dataHyp1
+
+#Create a new column with percentage of goal reached
+dataHyp1$Goal_percentage <- dataHyp1$Pledge_USD/dataHyp1$Goal_USD
+dataHyp1$Goal_percentage <- round(dataHyp1$Goal_percentage, digits = 3)
+dataHyp1$Goal_percentage[dataHyp1$Goal_percentage>100] = 100
+print(dataHyp1$Goal_percentage)
 #dataHyp1
 
 #Get from Creator_nb_backed only the number with a regex
-dataHyp1$Creator_nb_backed <- as.integer(gsub("[^0-9]", "", dataHyp1$Creator_nb_backed))
+dataHyp1$Creator_nb_backed <- gsub("[^0-9]", "", dataHyp1$Creator_nb_backed) #Seeing if this works better as a string rather than
+#dataHyp1
 
-#drop na values in dataHyp1
+#drop redundant columns
+dataHyp1 <- dataHyp1[,c('Creator_nb_projects', 'Creator_nb_backed', 'Goal_percentage')]
+
+
+#Drop the rows where nan values occur
 dataHyp1 <- dataHyp1[complete.cases(dataHyp1),]
-dataHyp1 <- dataHyp1[,c('Creator_nb_projects', 'Creator_nb_backed', 'Goal_met')]
-#dataHyp1
 
 
-#change Goal_met to binary
-dataHyp1$Goal_met <- as.integer(dataHyp1$Goal_met)
-#dataHyp1
-
-
-#Columns as integers
-dataHyp1$Creator_nb_backed <- as.integer(dataHyp1$Creator_nb_backed)
+#dataHyp1#Columns as integers
+#dataHyp1$Creator_nb_backed <- as.integer(dataHyp1$Creator_nb_backed)
 
 
 #to find an appropriate cutoff point:
 table(dataHyp1$Creator_nb_projects)
+table(dataHyp1$Creator_nb_backed)
 
 # we will only use values with at least 50 records, because for normal distribution you need a minimum of 50 values
 # So then you have an substantial amount of values
 
 
 #iterate over the values of the following table: table(dataHyp1$Creator_nb_projects)
-quan_table = table(dataHyp1$Creator_nb_projects)
+quan_table1 = table(dataHyp1$Creator_nb_projects)
+quan_table2 = table(dataHyp1$Creator_nb_backed)
 
 #in quan_table, drop the records where the value is < 50
-quan_table <- quan_table[quan_table >= 50]
+quan_table1 <- quan_table1[quan_table1 >= 50]
+quan_table2 <- quan_table2[quan_table2 >= 50]
 
 #clean the data such that only records with over 50 occurences are in there
-dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_projects %in% names(quan_table),]
+dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_projects %in% names(quan_table1),]
+dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_backed %in% names(quan_table2),]
+
+nrow(dataHyp1_2)
+
+#dataHyp1_2
 
 #make a table of the values of Creator_nb_projects
 table(dataHyp1_2$Creator_nb_projects)
+
+####I think this below is the old stuff, the newer stuff contained percentages
+
+#make a new column with boolean if goal_USD >= Pledge_USD
+#dataHyp1$Goal_met <- dataHyp1$Goal_USD <= dataHyp1$Pledge_USD
+#dataHyp1
+
+#Get from Creator_nb_backed only the number with a regex
+#dataHyp1$Creator_nb_backed <- as.integer(gsub("[^0-9]", "", dataHyp1$Creator_nb_backed))
+
+#drop na values in dataHyp1
+#dataHyp1 <- dataHyp1[complete.cases(dataHyp1),]
+#dataHyp1 <- dataHyp1[,c('Creator_nb_projects', 'Creator_nb_backed', 'Goal_met')]
+#dataHyp1
+
+
+#change Goal_met to binary
+#dataHyp1$Goal_met <- as.integer(dataHyp1$Goal_met)
+#dataHyp1
+
+
+#Columns as integers
+#dataHyp1$Creator_nb_backed <- as.integer#(dataHyp1$Creator_nb_backed)
+
+
+#to find an appropriate cutoff point:
+#table(dataHyp1$Creator_nb_projects)
+
+# we will only use values with at least 50 records, because for normal distribution you need a minimum of 50 values
+# So then you have an substantial amount of values
+
+
+#iterate over the values of the following table: table(dataHyp1$Creator_nb_projects)
+#quan_table = table(dataHyp1$Creator_nb_projects)
+
+#in quan_table, drop the records where the value is < 50
+#quan_table <- quan_table[quan_table >= 50]
+
+#clean the data such that only records with over 50 occurences are in there
+#dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_projects %in% names(quan_table),]
+
+#make a table of the values of Creator_nb_projects
+#table(dataHyp1_2$Creator_nb_projects)
 
 
 
 ```
 
-### Anova test, hypothesis 1
+### Regression and Anova test, hypothesis 1
 
 ```{r}
+
+
+
+
+
+###This is also old for the same reason as the previous
+
+
 #make a reg model to predict goal_met with Creator_nb_projects and Creator_nb_backed
-modelHyp1 <- lm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2)
+#modelHyp1 <- lm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2)
 
 #make a logreg model to predict goal_met with Creator_nb_projects and Creator_nb_backed
-modelHyp1Log <- glm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2, family = "binomial")
-summary(modelHyp1Log)
+#modelHyp1Log <- glm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2, family = "binomial")
+#summary(modelHyp1Log)
 
 
 
 #Perform anova test on dataHyp1
 
-Anova_normal <- anova(modelHyp1)
-Anova_log <- anova(modelHyp1Log)
+#Anova_normal <- anova(modelHyp1)
+#Anova_log <- anova(modelHyp1Log)
 
-stargazer::stargazer(list(Anova_normal, Anova_log), type = 'text')
+#stargazer::stargazer(list(Anova_normal, Anova_log), type = 'text')
 
 #table output both Anova_normal and Anova_log inline using stargazer
 ```
