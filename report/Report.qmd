@@ -46,14 +46,12 @@ getwd()
 
 ### Data Importing and cleaning, hypothesis 1
 
-In order to test the first hypothesis it is necessary to first clean the data.
+In order to test the first hypothesis it is necessary to first clean the data. The first step is to select the data that has a deadline is before week 32 in 2019 in unix time and make sure that the variables that will be used in the regression are of the correct class. Next, a percentage is derived from the pledge goal of the project and how much was actually pledged, this will be used as a measure of success. For this reason the projects with a pledge goal of 0 were removed, this avoids division by zero. It was also chosen that values that exceeded 100% would be set to this value, as these might be detected as outliers and could cause issues. After this, we check the distribution of the data and remove cases in which we don't have enough data for the number of projects backed and the number of projects created, which are proxies for learning in this study. We consider that having less than 50 data points is when the data point is removed, this is because 50 data points are the minimum for a normal distribution to be present (find citation). Finally, the null values are removed. The below shows the distribution of the learning proxies and the proxy for success.
 
 ```{r}
+
 #inspect the data
-#load .rds file named "info" into rstudio
-
-
-info32 <- readRDS("info.rds")
+info32
 
 #create new data with only a few columns of info32 dataset
 dataHyp1Sub <- info32[,c('Goal_USD','Pledge_USD','Launched_at','Deadline', 'Creator_nb_projects', 'Creator_nb_backed')]
@@ -68,6 +66,7 @@ dataHyp1 <- dataHyp1Sub[dataHyp1Sub$Deadline < 1565474400,]
 #count the number of rows in dataHyp1sub and dataHyp1
 nrow(dataHyp1Sub)
 nrow(dataHyp1)
+
 
 #columns to integer
 dataHyp1$Pledge_USD <- as.integer(dataHyp1$Pledge_USD)
@@ -120,12 +119,29 @@ quan_table2 <- quan_table2[quan_table2 >= 50]
 dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_projects %in% names(quan_table1),]
 dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_backed %in% names(quan_table2),]
 
-nrow(dataHyp1_2)
+#make a table of the values of Creator_nb_projects
+table(dataHyp1_2$Creator_nb_projects)
+
+#drop nan and inf values in dataHyp1_2
+dataHyp1_2 <- dataHyp1_2[complete.cases(dataHyp1_2),]
+
+
+
+x<-dataHyp1_2$Goal_percentage
+##check the distribution of the outcome variable
+hist(x)
+table(x)
+#looks exponential, so we try log transform
+y<-log(dataHyp1_2$Goal_percentage+1)
+qqnorm(y)
+qqline(y)
+#still skewed, so we try to include sqrt transform
+y<-sqrt(log(dataHyp1_2$Goal_percentage+1))
+qqnorm(y)
+qqline(y)
 
 #dataHyp1_2
 
-#make a table of the values of Creator_nb_projects
-table(dataHyp1_2$Creator_nb_projects)
 
 ####I think this below is the old stuff, the newer stuff contained percentages
 
@@ -170,6 +186,25 @@ table(dataHyp1_2$Creator_nb_projects)
 #make a table of the values of Creator_nb_projects
 #table(dataHyp1_2$Creator_nb_projects)
 
+
+
+```
+
+Next we check the distribution of the success proxy. We notice that it is not normal, so a couple of transformations are tried. First Log(x+1) is tried, given that 0% is still viable, this shift is necessary to avoid undefined values. Next sqrt(Log(x+1)) is applied, but even though it is better, with the QQ-plots below we notice that it is still not normally distributed. The first QQ-plot corresponds to Log(x+1) and the second is for sqrt(Log(x+1)). Therefore a Linear Regression model cannot be used.
+
+```{r}
+x<-dataHyp1_2$Goal_percentage
+##check the distribution of the outcome variable
+hist(x)
+table(x)
+#looks exponential, so we try log transform
+y<-log(dataHyp1_2$Goal_percentage+1)
+qqnorm(y)
+qqline(y)
+#still skewed, so we try to include sqrt transform
+y<-sqrt(log(dataHyp1_2$Goal_percentage+1))
+qqnorm(y)
+qqline(y)
 
 
 ```
