@@ -101,8 +101,14 @@ qqline(y)
 ##since there is no improvement, and the distribution seems exponential, we use
 ##poisson distribution
 
-modelPoisson <- glm(Goal_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = "log"))
+modelPoisson <- glm(Goal_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
 summary(modelPoisson)
+
+##try Gamma distribution
+
+dataHyp1_2$nonzero_percentage <- dataHyp1_2$Goal_percentage + 1e-6
+modelGamma  <- glm(nonzero_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
+summary(modelGamma)
 
 # trying zero inflation model
 ##can't use factors, need to one hot encode
@@ -133,13 +139,8 @@ inflDS$`dataHyp1_2$Goal_percentage`<- as.integer(round(inflDS$`dataHyp1_2$Goal_p
 modelZeroINFL <- pscl::zeroinfl(`dataHyp1_2$Goal_percentage` ~ . | ., dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
 summary(modelZeroINFL)
 
-#Create a linear model that predicts Goal_percentage with Creator_nb_projects and Creator_nb_backed
-modelHyp1 <- lm(Goal_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2)
-
-summary(modelHyp1)
-
 #Perform anova test on dataHyp1
-anova(modelHyp1)
+anova(modelPoisson)
 
 #visualize the model
 plot(modelHyp1) #-> from this you get the QQ test and stuff. The bookcamp shizzle to check whether the model is correct
