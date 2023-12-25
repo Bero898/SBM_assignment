@@ -85,6 +85,7 @@ dataHyp1_2 <- dataHyp1_2[complete.cases(dataHyp1_2),]
 #give summary statistics of dataHyp1_2
 summary(dataHyp1_2)
 
+x<-dataHyp1_2$Goal_percentage
 ##check the distribution of the outcome variable
 hist(x)
 table(x)
@@ -106,19 +107,30 @@ summary(modelPoisson)
 # trying zero inflation model
 ##can't use factors, need to one hot encode
 
+
+
 hot_encode <- model.matrix(~  Creator_nb_projects + Creator_nb_backed  - 1, data = dataHyp1_2)
 
 hot_encode<-as.data.frame(hot_encode)
 
+##can't use non integer values for the dependent variable
 
 inflDS <- cbind(dataHyp1_2$Goal_percentage, hot_encode)
-inflDS$`dataHyp1_2$Goal_percentage`<- inflDS$`dataHyp1_2$Goal_percentage`
+
+#don't run this if the second zeroinfl will be runned (it will cause issues with removing values to try to avoid skeweness)
+#inflDS$`dataHyp1_2$Goal_percentage`<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
+
+##doesn't converge
+modelZeroINFL <- pscl::zeroinfl(`dataHyp1_2$Goal_percentage` ~ . | ., dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
+
+##try to remove skeweness by ignoring certain values (between 0 an 1, to avoid having too much data)
+
+inflDS<- inflDS[!(inflDS$`dataHyp1_2$Goal_percentage` > 0 & inflDS$`dataHyp1_2$Goal_percentage` < 1), ]
+inflDS$`dataHyp1_2$Goal_percentage`<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
 
 
-print(inflDS)
-
-modelZeroINFL <- pscl::zeroinfl(`dataHyp1_2$Goal_percentage` ~ . | ., dist = "negbin", data = inflDS)
-
+##doesn't converge either
+modelZeroINFL <- pscl::zeroinfl(`dataHyp1_2$Goal_percentage` ~ . | ., dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
 summary(modelZeroINFL)
 
 #Create a linear model that predicts Goal_percentage with Creator_nb_projects and Creator_nb_backed
