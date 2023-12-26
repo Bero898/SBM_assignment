@@ -211,19 +211,20 @@ qqline(y)
 
 ### Regression and Anova test, hypothesis 1
 
+Given that the data is not normally distributed, and the tested transformations are not satisfactory a linear regression is not appropriate. By looking at the previous histogram, we can asses that the data seems to be from an exponential distribution with an inflated 0 value. Therefore, Poisson regression Gamma regression, and zero inflated regression are tried. It is important to note that the zero inflated value model did not converge, regardless of the preprocessing steps taken for this regression. The first step was hot-encoding the proxies for learning because the model doesn't take factors as inputs, then the percentages for the success were rounded to integers because the model only outputs integers. The possible reasons as to why this error still occured will be presented in the discussion section.
+
 ```{r}
 
-##since there is no improvement, and the distribution seems exponential, we use
 ##poisson distribution
 
 modelPoisson <- glm(Goal_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
-summary(modelPoisson)
+
 
 ##try Gamma distribution
 
 dataHyp1_2$nonzero_percentage <- dataHyp1_2$Goal_percentage + 1e-6
 modelGamma  <- glm(nonzero_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
-summary(modelGamma)
+
 
 # trying zero inflation model
 ##can't use factors, need to one hot encode
@@ -357,9 +358,12 @@ barplot(dataHyp1$Creator_nb_projects, names.arg = tableHyp1$vec_ind, xlab = "x",
 
 ```{r}
 
-dataHyp1
-dataHyp1$Creator_nb_projects
-tableHyp1$vec_ind
+summary(modelPoisson)
+summary(modelGamma)
+
+#dataHyp1
+#dataHyp1$Creator_nb_projects
+#tableHyp1$vec_ind
 
 ```
 
