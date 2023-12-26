@@ -213,7 +213,54 @@ qqline(y)
 
 ```{r}
 
+##since there is no improvement, and the distribution seems exponential, we use
+##poisson distribution
 
+modelPoisson <- glm(Goal_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
+summary(modelPoisson)
+
+##try Gamma distribution
+
+dataHyp1_2$nonzero_percentage <- dataHyp1_2$Goal_percentage + 1e-6
+modelGamma  <- glm(nonzero_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
+summary(modelGamma)
+
+# trying zero inflation model
+##can't use factors, need to one hot encode
+
+
+
+hot_encode <- model.matrix(~  Creator_nb_projects + Creator_nb_backed  - 1, data = dataHyp1_2)
+
+hot_encode<-as.data.frame(hot_encode)
+
+##can't use non integer values for the dependent variable
+
+inflDS <- cbind(dataHyp1_2$Goal_percentage, hot_encode)
+
+#don't run this if the second zeroinfl will be runned (it will cause issues with removing values to try to avoid skeweness)
+inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
+
+null_values_per_column <- sapply(inflDS, function(x) any(is.na(x)))
+
+# Print the result
+
+##doesn't converge
+modelZeroINFL_1 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
+
+##try to remove skeweness by ignoring certain values (between 0 an 1, to avoid having too much data)
+
+inflDS<- inflDS[!(inflDS$`dataHyp1_2$Goal_percentage` > 0 & inflDS$`dataHyp1_2$Goal_percentage` < 1), ]
+inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
+
+
+##doesn't converge either
+modelZeroINFL_2 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
+summary(modelZeroINFL)
+
+#Perform anova test on dataHyp1
+anova(modelPoisson)
+anova(modelGamma)
 
 
 

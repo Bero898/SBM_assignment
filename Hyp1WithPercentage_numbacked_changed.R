@@ -124,23 +124,28 @@ hot_encode<-as.data.frame(hot_encode)
 inflDS <- cbind(dataHyp1_2$Goal_percentage, hot_encode)
 
 #don't run this if the second zeroinfl will be runned (it will cause issues with removing values to try to avoid skeweness)
-#inflDS$`dataHyp1_2$Goal_percentage`<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
+inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
+
+null_values_per_column <- sapply(inflDS, function(x) any(is.na(x)))
+
+# Print the result
 
 ##doesn't converge
-modelZeroINFL <- pscl::zeroinfl(`dataHyp1_2$Goal_percentage` ~ . | ., dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
+modelZeroINFL_1 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
 
 ##try to remove skeweness by ignoring certain values (between 0 an 1, to avoid having too much data)
 
 inflDS<- inflDS[!(inflDS$`dataHyp1_2$Goal_percentage` > 0 & inflDS$`dataHyp1_2$Goal_percentage` < 1), ]
-inflDS$`dataHyp1_2$Goal_percentage`<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
+inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
 
 
 ##doesn't converge either
-modelZeroINFL <- pscl::zeroinfl(`dataHyp1_2$Goal_percentage` ~ . | ., dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
+modelZeroINFL_2 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
 summary(modelZeroINFL)
 
 #Perform anova test on dataHyp1
 anova(modelPoisson)
+anova(modelGamma)
 
 #visualize the model
 plot(modelHyp1) #-> from this you get the QQ test and stuff. The bookcamp shizzle to check whether the model is correct
