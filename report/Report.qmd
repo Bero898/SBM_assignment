@@ -40,7 +40,8 @@ Describe the data set that you used, the way you translated the raw data into va
 
 ```{r}
 getwd()
-#setwd("C:/Users/Borna/Documents/Study/Masters/Master A/Strategy and Business Models/SBM_assignment/report")
+set.seed(231)
+#setwd("C:/Users/Borna/Documents/Study/Masters/Master A/Strategy and Business Models/SBM_assignment/report")data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAa0lEQVR42u3OywnAIBBAwcXSUoCW5D11xDoNCBGNv0MOecJOBSOi1OZMsJ4dvFxEJ1OQnMxBarIKEpNNkJbsBknJYZCSnAYJyVVQziNig7/nZkFEbhTE5HpBVO4dxOXKIDL3BLG5BJ1T6rsbMfep2CaMN00AAAAASUVORK5CYII=
 #getwd()
 ```
 
@@ -273,7 +274,7 @@ summary(modelZeroINFL)
 #table output both Anova_normal and Anova_log inline using stargazer
 ```
 
-Given that the models are part of the Generalized Linear Model class, an ANODEV can be used. This tells us whether including a certain variable is significant for a better prediction of the dependent variable, therefore indicating whether a variable is important when predicting the success of a Kickstarter project.
+Given that the models are part of the Generalized Linear Model class, an Analysis of Deviance can be used. This tells us whether including a certain variable is significant for a better prediction of the dependent variable, therefore indicating whether a variable is important when predicting the success of a Kickstarter project.
 
 ### Some more cleaning and barplot creation
 
@@ -346,23 +347,41 @@ Roland: I don't know what this is to be honest.
 
 ### Hypothesis 1 results
 
-Given that the
+Given that the zero inflated model doesn't produce results, we proceed by studying the Poisson and Gamma models. First we look at the results for the Poisson Model.
 
 ```{r}
-
+##Poisson summary
 summary(modelPoissonInt)
-summary(modelGamma)
 
-#dataHyp1
-#dataHyp1$Creator_nb_projects
-#tableHyp1$vec_ind
+
+# dataHyp1
+# dataHyp1$Creator_nb_projects
+# tableHyp1$vec_ind
 
 ```
+
+From the results we see that most of the coefficients for both the number of backed projects and the number of projects created are significant. This suggests that the effects of the proxies we selected for learning are significant. In regards to the sign of the coefficients, we notice that none of the negative values are significant, with the exception of the intercept. Since the significant coefficients are positive, though small, we conclude that learning has a positive effect on success, which is in line with (find citation). In this case we don't notice an increasing pattern in of the coefficients, wherein more experience would have significantly higher values, as sometimes the coefficients decrease again.
 
 ```{r}
-A1<-anova(modelPoissonInt)
-A2<-anova(modelGamma)
+#Anova Poisson
+anova(modelPoissonInt)
 ```
+
+In the analysis of deviance table we notice that the inclusion of the number of projects backed reduces the deviance by a large margin, this justifies including these variables in the model, as it results in a better model.
+
+```{r}
+#Sumary for Gamma model
+summary(modelGamma)
+```
+
+For this model, we notice that the coefficients are not mostly significant in the case of the number of projects created; contrastingly, the number of projects backed does have mostly significant values. It is also important to note that this Gamma distribution model has a lower AIC than the Poisson distribution model. We also notice that if the values are placed in increasing order of the amounts projects back and of the number of projects created there is an increase in the coefficients. This suggests that the more experience one has, the better they tend to perform. We also notice that the values that don't follow this tendency don't have significant p-values.
+
+```{r}
+#Anova Gamma
+anova(modelGamma)
+```
+
+In this second analysis of deviance table, a similar effect is noticed to the previous, including the number of projects backed improves the model by reducing the deviance, which suggests that it's a good variable for the model. Therefore we can say that the success is not just explained by the experience one gains by doing more projects, but also observing the projects of others.
 
 Present the results of your analyses including descriptive statistics, regression tables, as well as any possible figures or visualizations that you made, e.g., those of the interaction effects.
 
