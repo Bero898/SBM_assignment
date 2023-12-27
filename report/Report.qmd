@@ -126,20 +126,6 @@ table(dataHyp1_2$Creator_nb_projects)
 dataHyp1_2 <- dataHyp1_2[complete.cases(dataHyp1_2),]
 
 
-
-x<-dataHyp1_2$Goal_percentage
-##check the distribution of the outcome variable
-hist(x)
-table(x)
-#looks exponential, so we try log transform
-y<-log(dataHyp1_2$Goal_percentage+1)
-qqnorm(y)
-qqline(y)
-#still skewed, so we try to include sqrt transform
-y<-sqrt(log(dataHyp1_2$Goal_percentage+1))
-qqnorm(y)
-qqline(y)
-
 #dataHyp1_2
 
 
@@ -211,19 +197,21 @@ qqline(y)
 
 ### Regression and Anova test, hypothesis 1
 
-Given that the data is not normally distributed, and the tested transformations are not satisfactory a linear regression is not appropriate. By looking at the previous histogram, we can asses that the data seems to be from an exponential distribution with an inflated 0 value. Therefore, Poisson regression Gamma regression, and zero inflated regression are tried. It is important to note that the zero inflated value model did not converge, regardless of the preprocessing steps taken for this regression. The first step was hot-encoding the proxies for learning because the model doesn't take factors as inputs, then the percentages for the success were rounded to integers because the model only outputs integers. The possible reasons as to why this error still occured will be presented in the discussion section.
+Given that the data is not normally distributed, and the tested transformations are not satisfactory a linear regression is not appropriate. By looking at the previous histogram, we can asses that the data seems to be from an exponential distribution with an inflated 0 value. Therefore, Poisson regression Gamma regression, and zero inflated regression are tried. For poisson regression, we round the goal percentage to the nearest integer, given that the model works for discrete outcome variables. It is also important to note that the zero inflated value model did not converge, regardless of the preprocessing steps taken for this regression. The first step was hot-encoding the proxies for learning because the model doesn't take factors as inputs, then the percentages for the success were rounded to integers because the model only outputs integers. The possible reasons as to why this error still occured will be presented in the discussion section.
 
 ```{r}
 
-##poisson distribution
-
-modelPoisson <- glm(Goal_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
-
+##non integer
 
 ##try Gamma distribution
 
 dataHyp1_2$nonzero_percentage <- dataHyp1_2$Goal_percentage + 1e-6
-modelGamma  <- glm(nonzero_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
+modelGamma  <- glm(nonzero_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = Gamma(link = 'identity'))
+
+dataHyp1_2$Goal_percentage_int <- as.integer(round(dataHyp1_2$Goal_percentage,0))
+##poisson distribution int
+
+modelPoissonInt <- glm(Goal_percentage_int ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
 
 
 # trying zero inflation model
@@ -259,9 +247,7 @@ inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
 modelZeroINFL_2 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
 summary(modelZeroINFL)
 
-#Perform anova test on dataHyp1
-anova(modelPoisson)
-anova(modelGamma)
+
 
 
 
@@ -287,7 +273,24 @@ anova(modelGamma)
 #table output both Anova_normal and Anova_log inline using stargazer
 ```
 
+```{r}
+summary(modelPoisson)
+summary(modelGamma)
+summary(modelPoissonInt)
+summary(modelGammaInt)
+```
+
+```{r}
+#Perform anova test on dataHyp1
+anova(modelPoisson)
+anova(modelGamma)
+anova(modelPoissonInt)
+anova(modelGammaInt)
+```
+
 ### Some more cleaning and barplot creation
+
+Roland: I don't know what this is to be honest.
 
 ```{r}
 #return the values of the loop in a vector
