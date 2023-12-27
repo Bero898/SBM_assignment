@@ -40,8 +40,8 @@ Describe the data set that you used, the way you translated the raw data into va
 
 ```{r}
 getwd()
-setwd("C:/Users/Borna/Documents/Study/Masters/Master A/Strategy and Business Models/SBM_assignment/report")
-getwd()
+#setwd("C:/Users/Borna/Documents/Study/Masters/Master A/Strategy and Business Models/SBM_assignment/report")
+#getwd()
 ```
 
 ### Data Importing and cleaning, hypothesis 1
@@ -273,84 +273,71 @@ summary(modelZeroINFL)
 #table output both Anova_normal and Anova_log inline using stargazer
 ```
 
-```{r}
-summary(modelPoisson)
-summary(modelGamma)
-summary(modelPoissonInt)
-summary(modelGammaInt)
-```
-
-```{r}
-#Perform anova test on dataHyp1
-anova(modelPoisson)
-anova(modelGamma)
-anova(modelPoissonInt)
-anova(modelGammaInt)
-```
+Given that the models are part of the Generalized Linear Model class, an ANODEV can be used. This tells us whether including a certain variable is significant for a better prediction of the dependent variable, therefore indicating whether a variable is important when predicting the success of a Kickstarter project.
 
 ### Some more cleaning and barplot creation
 
 Roland: I don't know what this is to be honest.
 
 ```{r}
-#return the values of the loop in a vector
-vec_val <- c()
-vec_ind <- c()
-vec_amount <- c()
-
-for (i in 1:as.integer(max(dataHyp1$Creator_nb_projects))){
-  vec_val[i] <- sum(dataHyp1$Goal_met[dataHyp1$Creator_nb_projects == i])/length(dataHyp1$Goal_met[dataHyp1$Creator_nb_projects == i])
-  vec_ind[i] <- i
-  vec_amount[i] <- length(dataHyp1$Goal_met[dataHyp1$Creator_nb_projects == i])
-}
-
-#create a table of vec_val and vec_ind as two columns with headers: index and percentage
-tableHyp1 <- data.frame(vec_ind, vec_val, vec_amount)
-tableHyp1
-
-
-
-```
-
-```{r}
-#make a barplot of the column vec_amount
-barplot(tableHyp1$vec_amount, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Number of projects of the creator", main = "Number of projects of the creator by number of projects of the creator")
-
-```
-
-```{r}
-
-
-#drop columns where nan exists
-tableHyp1 <- tableHyp1[complete.cases(tableHyp1),]
+# #return the values of the loop in a vector
+# vec_val <- c()
+# vec_ind <- c()
+# vec_amount <- c()
+# 
+# for (i in 1:as.integer(max(dataHyp1$Creator_nb_projects))){
+#   vec_val[i] <- sum(dataHyp1$Goal_met[dataHyp1$Creator_nb_projects == i])/length(dataHyp1$Goal_met[dataHyp1$Creator_nb_projects == i])
+#   vec_ind[i] <- i
+#   vec_amount[i] <- length(dataHyp1$Goal_met[dataHyp1$Creator_nb_projects == i])
+# }
+# 
+# #create a table of vec_val and vec_ind as two columns with headers: index and percentage
+# tableHyp1 <- data.frame(vec_ind, vec_val, vec_amount)
 # tableHyp1
 
 
-#make a barchart of tableHyp1
-barplot(tableHyp1$vec_val, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Percentage of projects that met their goal", main = "Percentage of projects that met their goal by number of projects of the creator")
-
 
 ```
 
 ```{r}
-#make a barchart of the number of projects per number of projects
-barplot(tableHyp1$vec_amount, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Number of projects of the creator", main = "Number of projects of the creator by number of projects of the creator")
-
+# #make a barplot of the column vec_amount
+# barplot(tableHyp1$vec_amount, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Number of projects of the creator", main = "Number of projects of the creator by number of projects of the creator")
 
 ```
 
 ```{r}
 
-# Convert the data to numeric if needed
-dataHyp1$Creator_nb_projects <- as.numeric(dataHyp1$Creator_nb_projects)
 
-# Check if 'tableHyp1$vec_ind' is numeric or convert it
-tableHyp1$vec_ind <- as.numeric(tableHyp1$vec_ind)
+# #drop columns where nan exists
+# tableHyp1 <- tableHyp1[complete.cases(tableHyp1),]
+# # tableHyp1
+# 
+# 
+# #make a barchart of tableHyp1
+# barplot(tableHyp1$vec_val, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Percentage of projects that met their goal", main = "Percentage of projects that met their goal by number of projects of the creator")
 
-# Now, create the barplot
-barplot(dataHyp1$Creator_nb_projects, names.arg = tableHyp1$vec_ind, xlab = "x", ylab = "y", main = "title")
 
-#this code raises an error. 
+```
+
+```{r}
+# #make a barchart of the number of projects per number of projects
+# barplot(tableHyp1$vec_amount, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Number of projects of the creator", main = "Number of projects of the creator by number of projects of the creator")
+
+
+```
+
+```{r}
+
+# # Convert the data to numeric if needed
+# dataHyp1$Creator_nb_projects <- as.numeric(dataHyp1$Creator_nb_projects)
+# 
+# # Check if 'tableHyp1$vec_ind' is numeric or convert it
+# tableHyp1$vec_ind <- as.numeric(tableHyp1$vec_ind)
+# 
+# # Now, create the barplot
+# barplot(dataHyp1$Creator_nb_projects, names.arg = tableHyp1$vec_ind, xlab = "x", ylab = "y", main = "title")
+# 
+# #this code raises an error. 
 
 
 ```
@@ -359,15 +346,22 @@ barplot(dataHyp1$Creator_nb_projects, names.arg = tableHyp1$vec_ind, xlab = "x",
 
 ### Hypothesis 1 results
 
+Given that the
+
 ```{r}
 
-summary(modelPoisson)
+summary(modelPoissonInt)
 summary(modelGamma)
 
 #dataHyp1
 #dataHyp1$Creator_nb_projects
 #tableHyp1$vec_ind
 
+```
+
+```{r}
+A1<-anova(modelPoissonInt)
+A2<-anova(modelGamma)
 ```
 
 Present the results of your analyses including descriptive statistics, regression tables, as well as any possible figures or visualizations that you made, e.g., those of the interaction effects.
