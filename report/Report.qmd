@@ -10,29 +10,38 @@ bibliography: references.bib
 
 ## Introduction
 
-Introduce the topic, explain why it is interesting (the research gap and the practical relevance), and formulate the research question.
+Introduce the topic, explain why it is interesting (the research gap and the practical relevance), and formulate the research question. \
+Note from Thomas: Better to introduce the two research questions here already.
+
+RQ1: How does experience impact the success rate?
+
+RQ2: How do business ideas change after experience?
+
+Second note: Just use the motivation slide from the presentation for why it is relevant.
 
 ## Theory and Hypotheses
 
 Explain the state of art in the relevant literature, building towards what is it exactly that you would like to research, consistent with your research question and research gap. If your research design allows for it, develop at most 3 hypotheses based on the theoretical framework you covered: what is it that you expect to see in the data, and why?
 
-### Assumptions
-
-We assume that an entrepreneur does not have any prior experience. We assume that the data is sufficient. For a proxy of successrate, we use the funding as a measure. We assume that the funding is a good proxy for success, because if the funding is not met, the project will not be realized. We assume that the data is not biased, because the data is collected by a third party. We assume that the data is not biased, because the data is collected by a third party. We assume that innovation-related words can also be taken as meaning innovation. By expanding the bucket of words referring to innovation we assure that the majority of the words related to innovation are covered.
-
-We do not assume that employees influence business results, as we are taking a look at Kickstarter projects. And start-up culture is not the same as corporate culture. We do not assume that the number of employees is a good proxy for experience, because the number of employees does not say anything about the experience of the employees [@martin2010].
-
 ### Research Question 1
-
-How does experience impact the success rate?
 
 Hypothesis 1: Experience will have a positive impact on whether the idea is successful.
 
 ### Research Question 2
 
-How do business ideas change after experience?
+The theoretical foundation of this research is grounded in the dynamic nature of entrepreneurial cognition and the impact of experiential learning on the evolution of business ideas. Entrepreneurial activities involve a continuous process of learning, adaptation, and refinement. According to cognitive theories of entrepreneurship, the experience gained through the implementation of an initial business idea contributes significantly to an entrepreneur's cognitive development [@marcati2008role]. The theoretical framework posits that as entrepreneurs engage in practical ventures, they accumulate knowledge, skills, and insights, thereby influencing the generation and transformation of subsequent business ideas [@marcati2008role]. The iterative nature of entrepreneurship suggests that learning from experience fosters a more sophisticated understanding of market dynamics, consumer needs, and effective business strategies. This accumulated knowledge is likely to lead to the generation of more innovative ideas over time. The theory is underpinned by the concept of the entrepreneurial learning cycle, emphasizing that the process of learning from experience enhances an entrepreneur's ability to conceive and implement innovative business ideas.
 
-Hypothesis 2: subsequent ideas are more innovative than the first idea.
+Building upon the theoretical framework, the hypothesis posits that **subsequent business ideas developed by entrepreneurs with prior experience are more innovative than their initial business idea**. This hypothesis is rooted in the belief that the knowledge gained from the practical implementation of the first idea contributes to an enhanced entrepreneurial mindset, characterized by a deeper understanding of market dynamics and a heightened ability to identify and capitalize on opportunities.
+
+### Assumptions
+
+To test both research questions and to validate both hypothesis, multiple assumptions are made. Firstly it is assumed that an entrepreneur does not have any prior experience before joining the database. When entrepreneurs have prior experience which is not covered in the data, the results will be skewed since the entrepreneurs with prior experience and new entrepreneurs can not be distinguished in the data. \
+Secondly, we assume that the data in the database is sufficient and that there are no other, unmeasured, variables that influence the outcome of this research.\
+Thirdly, to measure the succesrate, there is no explicit variable that measures succesrate. So, to measure succesrate, it is assumed that funding is a good proxy for succesrate. How successful a start-up is, is measured by the total raised funding divided by the funding goal. This will be a good approximation since projects where the funding goal is not reached will not get the money from Kickstarter and therefore can not start with their start-up.\
+Fourthly, it is assumed that the data is unbiased because the data is collected by a third party.\
+Fifthly, it is assumed that innovation-related words can also be taken as meaning innovation. By expanding the bucket of words referring to innovation we assure that the majority of the words related to innovation are covered.
+
+Lastly, it is not assumed that employees influence business results, as we are taking a look at Kickstarter projects. And start-up culture is not the same as corporate culture. It is not assumed that the number of employees is a good proxy for experience, because the number of employees does not say anything about the experience of the employees [@martin2010].
 
 ## Methods and Data
 
@@ -202,13 +211,7 @@ barplot(dataHyp1$Creator_nb_projects, names.arg = tableHyp1$vec_ind, xlab = "x",
 
 ### Data Importing and cleaning, research question 2
 
-First let us describe the data necessary for the second research question. We use the same dataset as the for the first research question: the kickstarter dataset. Besides a score for innovation, which we will discuss later, we used the following variables:
-- The number of projects that preceded this one (for the same entrepreneur). We made this both a number and a factor, to account for a decreasing effect as the number of observations decreased;
-- The number of dollars that the project aimed to achieve;
-- The duration of the project;
-- The success of the preceding project, which we defined as the number of dollars that project received divided by the number of dollars it aimed to achieve;
-- The category of the project (which is similar to the industry of the project) as control variables.
-Because of the pareto distribution that is generally considered to be present in income, we took the log values of the number of dollars that projects aimed to achieve and achieved [@pareto].
+First let us describe the data necessary for the second research question. We use the same dataset as the for the first research question: the kickstarter dataset. Besides a score for innovation, which we will discuss later, we used the following variables: - The number of projects that preceded this one (for the same entrepreneur). We made this both a number and a factor, to account for a decreasing effect as the number of observations decreased; - The number of dollars that the project aimed to achieve; - The duration of the project; - The success of the preceding project, which we defined as the number of dollars that project received divided by the number of dollars it aimed to achieve; - The category of the project (which is similar to the industry of the project) as control variables. Because of the pareto distribution that is generally considered to be present in income, we took the log values of the number of dollars that projects aimed to achieve and achieved [@pareto].
 
 ```{r}
 # Install and load required packages
@@ -257,6 +260,7 @@ dataHyp2 <- dataHyp2 %>%
 ```
 
 ### Defining innovation, research question 2
+
 Since our dependent variable is innovation, we need to have a measure for innovation. We got our measure for innovation from the description of the project. Using a CAT scanner for innovation, which is a corpus of scientifically verified innovation-related words, we gave an innovation metric to the description, which became the innovation metric for the entire project [@McKenny2018]. We used the existence of these words as the measure, and more of these words means a higher measure.
 
 ```{r}
@@ -275,6 +279,7 @@ dataHyp2$innovation <- innovation_ratios * 1000
 ```
 
 ### Defining linear models, research question 2
+
 The variables mentioned in the section discussing the importing and cleaning of the data discussed the variables that we took into consideration. We investigated the impact on innovation for each of those variables separately (mod0 to mod5), and then added the variables together iteratively. We did not investigate all combinations, because this would take too much effort. We made a couple of models, based on our intuition of relevant parameters. We then plot the models.
 
 ```{r}
@@ -299,6 +304,7 @@ texreg::screenreg(list(mod0, mod2, mod3, mod4, modA, modC, modE))
 ```
 
 ### Plotting innovation graphs
+
 Besides fitting a linear model, we also made graphs showing the impact of having multiple projects on the mean innovation and change in innovation compared to having one less project.
 
 ```{r}
@@ -346,16 +352,19 @@ Present the results of your analyses including descriptive statistics, regressio
 ### Hypothesis 2 results
 
 #### Linear models
-Let us first discuss the results from the linear models. Using a significance level of 0.05, which is justified because we are not dealing with a critical situation, we can see that in all linear models, the number of previous projects (the 'Order' term) has a significant effect on the innovation score of projects. We can also see that this effect is negative. This means that the more projects a creator has done, the less innovative a new project is expected to be. As said in the methods section, we also added the number of previous projects as a factor (the 'orderFactor' term). Without any control variables, we can see that as projects get more previous projects, the innovation score gets lower. However, after adding the control variables, the effect of 'orderFactor' was no longer determined to be significant.
+
+Let us first discuss the results from the linear models. Using a significance level of 0.05, which is justified since we are not dealing with a critical situation, we can see that in all linear models, the number of previous projects (the 'Order' term) has a significant effect on the innovation score of projects. We can also see that this effect is negative. This means that the more projects a creator has done, the less innovative a new project is expected to be. As said in the methods section, we also added the number of previous projects as a factor (the 'orderFactor' term). Without any control variables, we can see that as projects get more previous projects, the innovation score gets lower. However, after adding the control variables, the effect of 'orderFactor' was no longer determined to be significant.
 
 Comparing the models, it stands out that the 'category' term greatly increases the R-squared metric. We also see that a lot of categories significantly differ from the baseline category. We hypothesize that this means that some categories are more more likely to be innovative than others.
 
 #### Plots
+
 Looking at the plots, we are unable to see a clear trend. From our visual interpretations of the plots of the change in innovativeness. In the first plot, the red line seems to show that the number of projects slightly increases the innovation: the projects are - on average - slightly more innovative that the previous one, for the same entrepreneur. However, the effect seems to be very small, and there are lots of projects that are a lot less innovative than the previous ones for the same entrepreneur.
 
 From the plots showing the mean innovation score for every project, we can see that as entrepreneurs have more previous projects, the projects become less innovative, on average. This seems to be in contrast with the first plots, showing the change in innovation. This could be explained by the fact that innovative products are more difficult to produce and thus take longer. This would mean that people that make more innovative products are not able to do as many projects. This also implies that projects with a lot of previous projects only occur when the entrepreneur does not do innovative projects (because they simply take too long to complete).
 
 #### Justification of the results
+
 We hypothesized that people with more previous projects, would be more innovative that people with fewer previous projects. However, we found the opposite effect. This could be due to the fact that people with lots of previous projects may be entrenched in their communities. This could make them behave as 'imitative entrepreneurs' [@CLIFF2006633].
 
 As we said in the previous section, the effect can also be explained by the fact that projects with more previous projects can only be done by entrepreneurs that are less innovative. So this would mean that an increase in the number of projects is not the cause of an increase in innovativeness, but that an increase in number of projects is only possible for entrepreneurs that are not as innovative: instead of describing the effect of the number of projects, we described a feature of the data.
@@ -363,11 +372,13 @@ As we said in the previous section, the effect can also be explained by the fact
 #### Plots
 
 ## Discussion
+
 What did we learn from what you found in your results, how do those findings relate to the ongoing debate in literature, and what can practitioners learn from that?
 
 ### Limitations
-- Doing an innovative project may take more time to complete (the campaigns may be equally long, but building the product may take longer). This means that entrepreneurs that are more likely to do innovative projects will have done fewer projects in total. This means that projects with a lot of previous projects are almost all not innovative. This creates biases in our dataset.
-- There are only few entrepreneurs with over 20 projects. This may mean that the results for higher numbers of previous projects are not representative.
+
+-   Doing an innovative project may take more time to complete (the campaigns may be equally long, but building the product may take longer). This means that entrepreneurs that are more likely to do innovative projects will have done fewer projects in total. This means that projects with a lot of previous projects are almost all not innovative. This creates biases in our dataset.
+-   There are only few entrepreneurs with over 20 projects. This may mean that the results for higher numbers of previous projects are not representative.
 
 ## Conclusion (?)
 
