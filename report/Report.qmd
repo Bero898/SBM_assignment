@@ -21,6 +21,10 @@ Second note: Just use the motivation slide from the presentation for why it is r
 
 ## Theory and Hypotheses
 
+The Behavioural Theory of the Firm theorizes how organisations operate based on coallitions of various participants. Each participant has their own goals and aspirations, and the firm's behaviour as a whole is a result of the equilibrium reached by the bargaining process between those individuals (.
+
+When looking at how Experience impacts success rate
+
 Explain the state of art in the relevant literature, building towards what is it exactly that you would like to research, consistent with your research question and research gap. If your research design allows for it, develop at most 3 hypotheses based on the theoretical framework you covered: what is it that you expect to see in the data, and why?
 
 ### Research Question 1
