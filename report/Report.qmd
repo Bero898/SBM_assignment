@@ -29,7 +29,9 @@ Explain the state of art in the relevant literature, building towards what is it
 
 ### Research Question 1
 
-Hypothesis 1: Experience will have a positive impact on whether the idea is successful.
+The first research question relates to the idea of Organizational Learning developed by Levitt and March, given that it studies how KickStarter creators learn from their previous endevours and the experience of others. Given this focus on KickStarter creators, the research question is centered in the case of an entrepreneurial organization. Therefore, it builds on the theory presented by Parker, where it was found that serial entrepreneurs have an performance improvement due to gained experience. The study also concluded that the benefits of this experience diminished over time (cite). This research question also builds upon a study by Blank which found that, in the case of student startups, previous experience in entrepreneurship did not result in significant benefits for the survival of the startup when compared to advice given by a mentor. The explanation given for this was that previous experience would cause a tendency to imitate processes and routines that were tested in the past, which may harm the survival of the organization(cite).
+
+Given these contradictory results regarding past experience, we decided to formulate the hypothesis in line with the results of Parker, as the situation is more general and thus more applicable to the case of KickStarter. Thus the hypothesis is **people who have experience in stating companies will have more success than people who do not have this experience.**
 
 ### Research Question 2
 
