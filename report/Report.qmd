@@ -10,7 +10,7 @@ bibliography: references.bib
 
 ## Introduction
 
-Introduce the topic, explain why it is interesting (the research gap and the practical relevance), and formulate the research question. \
+Introduce the topic, explain why it is interesting (the research gap and the practical relevance), and formulate the research question.\
 Note from Thomas: Better to introduce the two research questions here already.
 
 RQ1: How does experience impact the success rate?
@@ -35,7 +35,7 @@ Building upon the theoretical framework, the hypothesis posits that **subsequent
 
 ### Assumptions
 
-To test both research questions and to validate both hypothesis, multiple assumptions are made. Firstly it is assumed that an entrepreneur does not have any prior experience before joining the database. When entrepreneurs have prior experience which is not covered in the data, the results will be skewed since the entrepreneurs with prior experience and new entrepreneurs can not be distinguished in the data. \
+To test both research questions and to validate both hypothesis, multiple assumptions are made. Firstly it is assumed that an entrepreneur does not have any prior experience before joining the database. When entrepreneurs have prior experience which is not covered in the data, the results will be skewed since the entrepreneurs with prior experience and new entrepreneurs can not be distinguished in the data.\
 Secondly, we assume that the data in the database is sufficient and that there are no other, unmeasured, variables that influence the outcome of this research.\
 Thirdly, to measure the succesrate, there is no explicit variable that measures succesrate. So, to measure succesrate, it is assumed that funding is a good proxy for succesrate. How successful a start-up is, is measured by the total raised funding divided by the funding goal. This will be a good approximation since projects where the funding goal is not reached will not get the money from Kickstarter and therefore can not start with their start-up.\
 Fourthly, it is assumed that the data is unbiased because the data is collected by a third party.\
@@ -55,12 +55,13 @@ getwd()
 
 ### Data Importing and cleaning, research question 1
 
+In order to test the first hypothesis it is necessary to first clean the data. The first step is to select the data that has a deadline is before week 32 in 2019 in unix time and make sure that the variables that will be used in the regression are of the correct class. Next, a percentage is derived from the pledge goal of the project and how much was actually pledged, this will be used as a measure of success. For this reason the projects with a pledge goal of 0 were removed, this avoids division by zero. It was also chosen that values that exceeded 100% would be set to this value, as these might be detected as outliers and could cause issues. After this, we check the distribution of the data and remove cases in which we don't have enough data for the number of projects backed and the number of projects created, which are proxies for learning in this study. We consider that having less than 50 data points is when the data point is removed, this is because 50 data points are the minimum for a normal distribution to be present (find citation). Finally, the null values are removed. The below shows the distribution of the learning proxies and the proxy for success.
+
 ```{r}
 #inspect the data
 #load .rds file named "info" into rstudio
 
-
-info32 <- readRDS("info.rds")
+info32
 
 #create new data with only a few columns of info32 dataset
 dataHyp1Sub <- info32[,c('Goal_USD','Pledge_USD','Launched_at','Deadline', 'Creator_nb_projects', 'Creator_nb_backed')]
@@ -77,67 +78,139 @@ nrow(dataHyp1Sub)
 nrow(dataHyp1)
 
 
-#make a new column with boolean if goal_USD >= Pledge_USD
-dataHyp1$Goal_met <- dataHyp1$Goal_USD <= dataHyp1$Pledge_USD
+#columns to integer
+dataHyp1$Pledge_USD <- as.integer(dataHyp1$Pledge_USD)
+dataHyp1$Goal_USD <- as.integer(dataHyp1$Goal_USD)
+
+#drop the rows where Goal_USD is 0 -> then you might get inf percentage
+dataHyp1 <- dataHyp1[dataHyp1$Goal_USD != 0,]
+#dataHyp1
+
+#Create a new column with percentage of goal reached
+dataHyp1$Goal_percentage <- dataHyp1$Pledge_USD/dataHyp1$Goal_USD
+dataHyp1$Goal_percentage <- round(dataHyp1$Goal_percentage, digits = 3)
+dataHyp1$Goal_percentage[dataHyp1$Goal_percentage>100] = 100
+print(dataHyp1$Goal_percentage)
 #dataHyp1
 
 #Get from Creator_nb_backed only the number with a regex
-dataHyp1$Creator_nb_backed <- as.integer(gsub("[^0-9]", "", dataHyp1$Creator_nb_backed))
+dataHyp1$Creator_nb_backed <- gsub("[^0-9]", "", dataHyp1$Creator_nb_backed) #Seeing if this works better as a string rather than
+#dataHyp1
 
-#drop na values in dataHyp1
+#drop redundant columns
+dataHyp1 <- dataHyp1[,c('Creator_nb_projects', 'Creator_nb_backed', 'Goal_percentage')]
+
+
+#Drop the rows where nan values occur
 dataHyp1 <- dataHyp1[complete.cases(dataHyp1),]
-dataHyp1 <- dataHyp1[,c('Creator_nb_projects', 'Creator_nb_backed', 'Goal_met')]
-#dataHyp1
 
 
-#change Goal_met to binary
-dataHyp1$Goal_met <- as.integer(dataHyp1$Goal_met)
-#dataHyp1
-
-
-#Columns as integers
-dataHyp1$Creator_nb_backed <- as.integer(dataHyp1$Creator_nb_backed)
+#dataHyp1#Columns as integers
+#dataHyp1$Creator_nb_backed <- as.integer(dataHyp1$Creator_nb_backed)
 
 
 #to find an appropriate cutoff point:
 table(dataHyp1$Creator_nb_projects)
+table(dataHyp1$Creator_nb_backed)
 
 # we will only use values with at least 50 records, because for normal distribution you need a minimum of 50 values
 # So then you have an substantial amount of values
 
 
 #iterate over the values of the following table: table(dataHyp1$Creator_nb_projects)
-quan_table = table(dataHyp1$Creator_nb_projects)
+quan_table1 = table(dataHyp1$Creator_nb_projects)
+quan_table2 = table(dataHyp1$Creator_nb_backed)
 
 #in quan_table, drop the records where the value is < 50
-quan_table <- quan_table[quan_table >= 50]
+quan_table1 <- quan_table1[quan_table1 >= 50]
+quan_table2 <- quan_table2[quan_table2 >= 50]
 
 #clean the data such that only records with over 50 occurences are in there
-dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_projects %in% names(quan_table),]
+dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_projects %in% names(quan_table1),]
+dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_backed %in% names(quan_table2),]
 
 #make a table of the values of Creator_nb_projects
 table(dataHyp1_2$Creator_nb_projects)
+
+#drop nan and inf values in dataHyp1_2
+dataHyp1_2 <- dataHyp1_2[complete.cases(dataHyp1_2),]
+
 
 
 
 ```
 
-### Anova test, research question 1
+Next we check the distribution of the success proxy. We notice that it is not normal, so a couple of transformations are tried. First Log(x+1) is tried, given that 0% is still viable, this shift is necessary to avoid undefined values. Next sqrt(Log(x+1)) is applied, but even though it is better, with the QQ-plots below we notice that it is still not normally distributed. The first QQ-plot corresponds to Log(x+1) and the second is for sqrt(Log(x+1)). Therefore a Linear Regression model cannot be used.
 
 ```{r}
-#make a reg model to predict goal_met with Creator_nb_projects and Creator_nb_backed
-modelHyp1 <- lm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2)
+x<-dataHyp1_2$Goal_percentage
+##check the distribution of the outcome variable
+hist(x)
+table(x)
+#looks exponential, so we try log transform
+y<-log(dataHyp1_2$Goal_percentage+1)
+qqnorm(y)
+qqline(y)
+#still skewed, so we try to include sqrt transform
+y<-sqrt(log(dataHyp1_2$Goal_percentage+1))
+qqnorm(y)
+qqline(y)
 
-#make a logreg model to predict goal_met with Creator_nb_projects and Creator_nb_backed
-modelHyp1Log <- glm(Goal_met ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2, family = "binomial")
-summary(modelHyp1Log)
+```
+
+### Regression and Anova test, research question 1
+
+Given that the data is not normally distributed, and the tested transformations are not satisfactory a linear regression is not appropriate. By looking at the previous histogram, we can asses that the data seems to be from an exponential distribution with an inflated 0 value. Therefore, Poisson regression Gamma regression, and zero inflated regression are tried. For poisson regression, we round the goal percentage to the nearest integer, given that the model works for discrete outcome variables. It is also important to note that the zero inflated value model did not converge, regardless of the preprocessing steps taken for this regression. The first step was hot-encoding the proxies for learning because the model doesn't take factors as inputs, then the percentages for the success were rounded to integers because the model only outputs integers. The possible reasons as to why this error still occured will be presented in the discussion section.
+
+```{r}
+##non integer
+
+##try Gamma distribution
+
+dataHyp1_2$nonzero_percentage <- dataHyp1_2$Goal_percentage + 1e-6
+modelGamma  <- glm(nonzero_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = Gamma(link = 'identity'))
+
+dataHyp1_2$Goal_percentage_int <- as.integer(round(dataHyp1_2$Goal_percentage,0))
+##poisson distribution int
+
+modelPoissonInt <- glm(Goal_percentage_int ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
+
+
+# trying zero inflation model
+##can't use factors, need to one hot encode
 
 
 
-#Perform anova test on dataHyp1
+hot_encode <- model.matrix(~  Creator_nb_projects + Creator_nb_backed  - 1, data = dataHyp1_2)
 
-Anova_normal <- anova(modelHyp1)
-Anova_log <- anova(modelHyp1Log)
+hot_encode<-as.data.frame(hot_encode)
+
+##can't use non integer values for the dependent variable
+
+inflDS <- cbind(dataHyp1_2$Goal_percentage, hot_encode)
+
+#don't run this if the second zeroinfl will be runned (it will cause issues with removing values to try to avoid skeweness)
+inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
+
+null_values_per_column <- sapply(inflDS, function(x) any(is.na(x)))
+
+# Print the result
+
+##doesn't converge
+modelZeroINFL_1 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
+
+##try to remove skeweness by ignoring certain values (between 0 an 1, to avoid having too much data)
+
+inflDS<- inflDS[!(inflDS$`dataHyp1_2$Goal_percentage` > 0 & inflDS$`dataHyp1_2$Goal_percentage` < 1), ]
+inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
+
+
+##doesn't converge either
+modelZeroINFL_2 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
+summary(modelZeroINFL)
+
+##will need to do stargazer for this
+
 
 stargazer::stargazer(list(Anova_normal, Anova_log), type = 'text')
 
@@ -339,13 +412,38 @@ ggplot(dataHyp2, aes(x = Order, y = innovation)) +
 
 ### Hypothesis 1 results
 
-```{r}
+Given that the zero inflated model doesn't produce results, we proceed by studying the Poisson and Gamma models. First we look at the results for the Poisson Model.
 
-dataHyp1
-dataHyp1$Creator_nb_projects
-tableHyp1$vec_ind
+```{r}
+##Poisson summary
+summary(modelPoissonInt)
+
 
 ```
+
+From the results we see that most of the coefficients for both the number of backed projects and the number of projects created are significant. This suggests that the effects of the proxies we selected for learning are significant. In regards to the sign of the coefficients, we notice that none of the negative values are significant, with the exception of the intercept. Since the significant coefficients are positive, though small, we conclude that learning has a positive effect on success, which is in line with (find citation). In this case we don't notice an increasing pattern in of the coefficients, wherein more experience would have significantly higher values, as sometimes the coefficients decrease again.
+
+```{r}
+#Anova Poisson
+anova(modelPoissonInt)
+
+```
+
+In the analysis of deviance table we notice that the inclusion of the number of projects backed reduces the deviance by a large margin, this justifies including these variables in the model, as it results in a better model.
+
+```{r}
+#Sumary for Gamma model
+summary(modelGamma)
+```
+
+For this model, we notice that the coefficients are not mostly significant in the case of the number of projects created; contrastingly, the number of projects backed does have mostly significant values. It is also important to note that this Gamma distribution model has a lower AIC than the Poisson distribution model. We also notice that if the values are placed in increasing order of the amounts projects back and of the number of projects created there is an increase in the coefficients. This suggests that the more experience one has, the better they tend to perform. We also notice that the values that don't follow this tendency don't have significant p-values.
+
+```{r}
+#Anova Gamma
+anova(modelGamma)
+```
+
+In this second analysis of deviance table, a similar effect is noticed to the previous, including the number of projects backed improves the model by reducing the deviance, which suggests that it's a good variable for the model. Therefore we can say that the success is not just explained by the experience one gains by doing more projects, but also observing the projects of others.
 
 Present the results of your analyses including descriptive statistics, regression tables, as well as any possible figures or visualizations that you made, e.g., those of the interaction effects.
 
