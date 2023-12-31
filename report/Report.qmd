@@ -21,11 +21,9 @@ Second note: Just use the motivation slide from the presentation for why it is r
 
 ## Theory and Hypotheses
 
-The Behavioural Theory of the Firm theorizes how organisations operate based on coallitions of various participants. Each participant has their own goals and aspirations, and the firm's behaviour as a whole is a result of the equilibrium reached by the bargaining process between those individuals (.
+The Behavioural Theory of the Firm theorizes how organisations operate based on coallitions of various participants. Each participant has their own goals and aspirations, and the firm's behaviour as a whole is a result of the equilibrium reached by the choices of the individuals, bargaining process between those individuals, and the selections they make [@cyert1963] [@Levitt].
 
-When looking at how Experience impacts success rate
-
-Explain the state of art in the relevant literature, building towards what is it exactly that you would like to research, consistent with your research question and research gap. If your research design allows for it, develop at most 3 hypotheses based on the theoretical framework you covered: what is it that you expect to see in the data, and why?
+However, the way an organization learns, though intertwined with these processes, can be framed differently. This framework, proposed by Levitt & March, focuses on three processes: behavior of organizations is based on routines, the actions of an organization are history-dependent, and organizations are goal oriented [@Levitt]. Levitt & March also suggest that organizations can learn from direct experience, and indirectly from the experience of others. Therefore it is important to take these two possibilities into account when studying organizational learning, as this research intends to do. This means that data on direct experience and indirect experience is necessary for the goals of this study.
 
 ### Research Question 1
 
@@ -67,7 +65,7 @@ In order to test the first hypothesis it is necessary to first clean the data. T
 #inspect the data
 #load .rds file named "info" into rstudio
 
-info32
+
 
 #create new data with only a few columns of info32 dataset
 dataHyp1Sub <- info32[,c('Goal_USD','Pledge_USD','Launched_at','Deadline', 'Creator_nb_projects', 'Creator_nb_backed')]
@@ -78,10 +76,6 @@ dataHyp1 <- dataHyp1Sub[dataHyp1Sub$Deadline < 1565474400,]
 #dataHyp1
 
 #You drop only 1850 records out of 75000
-
-#count the number of rows in dataHyp1sub and dataHyp1
-nrow(dataHyp1Sub)
-nrow(dataHyp1)
 
 
 #columns to integer
@@ -96,7 +90,6 @@ dataHyp1 <- dataHyp1[dataHyp1$Goal_USD != 0,]
 dataHyp1$Goal_percentage <- dataHyp1$Pledge_USD/dataHyp1$Goal_USD
 dataHyp1$Goal_percentage <- round(dataHyp1$Goal_percentage, digits = 3)
 dataHyp1$Goal_percentage[dataHyp1$Goal_percentage>100] = 100
-print(dataHyp1$Goal_percentage)
 #dataHyp1
 
 #Get from Creator_nb_backed only the number with a regex
@@ -111,13 +104,7 @@ dataHyp1 <- dataHyp1[,c('Creator_nb_projects', 'Creator_nb_backed', 'Goal_percen
 dataHyp1 <- dataHyp1[complete.cases(dataHyp1),]
 
 
-#dataHyp1#Columns as integers
-#dataHyp1$Creator_nb_backed <- as.integer(dataHyp1$Creator_nb_backed)
-
-
 #to find an appropriate cutoff point:
-table(dataHyp1$Creator_nb_projects)
-table(dataHyp1$Creator_nb_backed)
 
 # we will only use values with at least 50 records, because for normal distribution you need a minimum of 50 values
 # So then you have an substantial amount of values
@@ -135,15 +122,21 @@ quan_table2 <- quan_table2[quan_table2 >= 50]
 dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_projects %in% names(quan_table1),]
 dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_backed %in% names(quan_table2),]
 
-#make a table of the values of Creator_nb_projects
-table(dataHyp1_2$Creator_nb_projects)
-
 #drop nan and inf values in dataHyp1_2
 dataHyp1_2 <- dataHyp1_2[complete.cases(dataHyp1_2),]
 
+hist(as.numeric(dataHyp1_2$Creator_nb_projects), main = 'Histogram of Number of Projects Created (learning)')
 
 
 
+```
+
+```{r}
+hist(as.numeric(dataHyp1_2$Creator_nb_backed), main = 'Histogram of Number of Projects Backed (learning)')
+```
+
+```{r}
+hist(dataHyp1_2$Goal_percentage, main = 'Histogram of the Percentage of the Goal that was reached (success)')
 ```
 
 Next we check the distribution of the success proxy. We notice that it is not normal, so a couple of transformations are tried. First Log(x+1) is tried, given that 0% is still viable, this shift is necessary to avoid undefined values. Next sqrt(Log(x+1)) is applied, but even though it is better, with the QQ-plots below we notice that it is still not normally distributed. The first QQ-plot corresponds to Log(x+1) and the second is for sqrt(Log(x+1)). Therefore a Linear Regression model cannot be used.
