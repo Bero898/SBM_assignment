@@ -356,6 +356,7 @@ dataHyp2$innovation <- innovation_ratios * 1000
 The variables mentioned in the section discussing the importing and cleaning of the data discussed the variables that we took into consideration. We investigated the impact on innovation for each of those variables separately (mod0 to mod5), and then added the variables together iteratively. We did not investigate all combinations, because this would take too much effort. We made a couple of models, based on our intuition of relevant parameters. We then plot the models.
 
 ```{r}
+
 mod0 <- lm(innovation ~ Order, data=dataHyp2)
 mod1 <- lm(innovation ~ orderFactor, data=dataHyp2)
 mod2 <- lm(innovation ~ Goal_USD, data=dataHyp2)
@@ -471,9 +472,13 @@ We hypothesized that people with more previous projects, would be more innovativ
 
 As we said in the previous section, the effect can also be explained by the fact that projects with more previous projects can only be done by entrepreneurs that are less innovative. So this would mean that an increase in the number of projects is not the cause of an increase in innovativeness, but that an increase in number of projects is only possible for entrepreneurs that are not as innovative: instead of describing the effect of the number of projects, we described a feature of the data.
 
-#### Plots
-
 ## Discussion
+
+In this report we have found that, in the context of Kickstarter, entrepreneurs who become more experienced tend to become more successful in the endeavor of obtaining funding from users of the platform, though the benefits gained from the experience are not permanent. As mentioned previously, this is in accordance to the results of Parker's article [@PARKER] and seem to contradict the fact that experience does not affect success, as shown by Blank [@blank]. This study however does not definitively disprove or prove the previous results though, as it is centered around the context of Kickstarter, and thus suggests that more research must be done in the area of organizational learning to determine if more experience improves the odds of success of an entrepreneur's project.
+
+It was also shown that Kickstarter entrepreneurs tend towards being less innovative as they become more experienced, suggesting that they become "imitative entrepreneurs" as proposed by [@CLIFF2006633]. Therefore, this report solidifies Cliff's findings and expands the literature into the digital entrepreneurship which Kickstarter is a pert of. It is then important that entrepreneurs are able to keep this in mind, as in the search for success one might try to gain experience on what successful projects may look like which could foster less innovative ideas. So a balance between experience and innovativeness must be struck, as without innovativeness it seems intuitive to say that the market will become saturated, thus decreasing chances of success.
+
+This contradictory nature of becoming more experienced to achieve success, causing less innovativness that saturates the market one tries to be successful in creates an interesting room for discussion about where the balance between experience and innovativeness lies as to retain uniqueness and at the same time be successful. This is because a study by Hult [@HULT] found that innovativeness improves performance of businesses and is thus an aspect businesses must retain. It is therefore of interest to future research to study experience and innovativeness to see if balance is necessary, or if one of these two aspects supersedes the other.
 
 What did we learn from what you found in your results, how do those findings relate to the ongoing debate in literature, and what can practitioners learn from that?
 
