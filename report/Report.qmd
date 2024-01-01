@@ -12,7 +12,7 @@ bibliography: references.bib
 
 Kickstarter is a crowdfunding platform where creators can share their ideas for a product or service to bring it to life. Creators can set a pledge goal, which they believe will ensure that the project will be a success; other users can pledge money. Creators have several ways to attract donators, for instance they could promise perks to those who donate, they could promise an improved product depending on the amount reached, and they could be more transparent about progress. Creating a successful project on this site might be considered a matter of luck to many; however, with the availability of a data set of this platform, it is possible to study a factor that could influence the success of a project.
 
-Creators in Kickstarter can be seen as entrepreneurs of a business with the goal of providing a product or a service. Thus, an organizational framework can be used to see what factors are at play in determining a project's success. The behavioral theory of the firm is one such framework, and it allows for the study of how learning affects the firm [@cyert1963]. It is commonly believed that more experience leads to a better chance of success for a business [@Levitt][@PARKER], however there are those who argue against this notion [@blank], resulting in a contradicting literature. It is also interesting to study how experience affects the way that creators change their ideas, more specifically if their ideas become more or less innovative as they become more experienced (try to cite something, if tihs part needs to be changed it would be good if Bram could take a look to perhaps connect it to the Research Question 2 section).
+Creators in Kickstarter can be seen as entrepreneurs of a business with the goal of providing a product or a service. Thus, an organizational framework can be used to see what factors are at play in determining a project's success. The behavioral theory of the firm is one such framework, and it allows for the study of how learning affects the firm [@cyert1963]. It is commonly believed that more experience leads to a better chance of success for a business [@Levitt][@PARKER], however there are those who argue against this notion [@blank], resulting in a contradicting literature. It is also interesting to study how experience affects the way that creators change their ideas, more specifically if their ideas become more or less innovative as they become more experienced. Entrepreneurial experience has been suggested to increase reported innovation [@Vaillant2019].
 
 For this purpose, the following research questions were formulated:
 
@@ -476,9 +476,9 @@ As we said in the previous section, the effect can also be explained by the fact
 
 In this report we have found that, in the context of Kickstarter, entrepreneurs who become more experienced tend to become more successful in the endeavor of obtaining funding from users of the platform, though the benefits gained from the experience are not permanent. As mentioned previously, this is in accordance to the results of Parker's article [@PARKER] and seem to contradict the fact that experience does not affect success, as shown by Blank [@blank]. This study however does not definitively disprove or prove the previous results though, as it is centered around the context of Kickstarter, and thus suggests that more research must be done in the area of organizational learning to determine if more experience improves the odds of success of an entrepreneur's project.
 
-It was also shown that Kickstarter entrepreneurs tend towards being less innovative as they become more experienced, suggesting that they become "imitative entrepreneurs" as proposed by [@CLIFF2006633]. Therefore, this report solidifies Cliff's findings and expands the literature into the digital entrepreneurship which Kickstarter is a pert of. It is then important that entrepreneurs are able to keep this in mind, as in the search for success one might try to gain experience on what successful projects may look like which could foster less innovative ideas. So a balance between experience and innovativeness must be struck, as without innovativeness it seems intuitive to say that the market will become saturated, thus decreasing chances of success.
+It was also shown that Kickstarter entrepreneurs tend towards being less innovative as they become more experienced. This might be caused by them becoming "imitative entrepreneurs" as proposed by [@CLIFF2006633]. Therefore, this report solidifies Cliff's findings and expands the literature into the digital entrepreneurship which Kickstarter is a part of. It is then important that entrepreneurs are able to keep this in mind, as in the search for success one might try to gain experience on what successful projects may look like which could foster less innovative ideas. So a balance between experience and innovativeness must be struck, as without innovativeness it seems intuitive to say that the market will become saturated, thus decreasing chances of success.
 
-This contradictory nature of becoming more experienced to achieve success, causing less innovativness that saturates the market one tries to be successful in creates an interesting room for discussion about where the balance between experience and innovativeness lies as to retain uniqueness and at the same time be successful. This is because a study by Hult [@HULT] found that innovativeness improves performance of businesses and is thus an aspect businesses must retain. It is therefore of interest to future research to study experience and innovativeness to see if balance is necessary, or if one of these two aspects supersedes the other.
+This contradictory nature of becoming more experienced to achieve success, while becoming less innovative, which saturates the market, creates interesting room for discussion about the balance between experience and innovativeness: how does innovation impact the probabilities for success. A study by Hult [@HULT] found that innovativeness improves performance of businesses and is thus an aspect businesses must retain. It is therefore of interest to future research to study the effect of both experience and innovativeness on success, for example: does one supersede the other?
 
 ### Limitations
 
@@ -490,8 +490,32 @@ The fact that very few creators make a large amount of projects is also a limita
 
 ## Conclusion
 
-In conclusion this report set out to answer questions about whether or not experience impacts entrepreneurs in regards to success and to innovativeness. The results show that experience is a positive predictor of success, but a negative predictor of innovativeness. The results regarding success suggest that further research needs to be made in order to conclusively decide whether this is the case of entrepreneurs as a whole and not just in Kickstarter. The results regarding innovativeness suggest that research can be made in order to see what the trade off between experience and innovativeness is, and how to maximize the success of a business by taking this into account.
+In conclusion, this report set out to answer questions about whether or not experience impacts entrepreneurs in regards to success and to innovativeness. The results show that experience is a positive predictor of success, but a negative predictor of innovativeness in entrepreneurs in the kickstarter dataset. The results regarding success suggest that further research needs to be made in order to conclusively decide whether this is the case of entrepreneurs as a whole and not just in Kickstarter. The results regarding innovativeness suggest that research can be made in order to see what the trade off between experience and innovativeness is, and how to maximize the success of a business by taking this into account.
 
 ## References
+
+::: {#refs}
+1.  Arnold, Barry C. 2015. "Pareto Distribution." In Wiley StatsRef: Statistics Reference Online, 1--10. John Wiley & Sons, Ltd. <https://doi.org/https://doi.org/10.1002/9781118445112.stat01100.pub2>.
+
+2.  Blank, Tali Hadasa. 2021. "When Incubator Resources Are Crucial: Survival Chances of Student Startups Operating in an Academic Incubator." The Journal of Technology Transfer 46 (6): 1845--68. <https://doi.org/10.1007/s10961-020-09831-4>.
+
+3.  Cliff, Jennifer E., P. Devereaux Jennings, and Royston Greenwood. 2006. "New to the Game and Questioning the Rules: The Experiences and Beliefs of Founders Who Start Imitative Versus Innovative Firms." Journal of Business Venturing 21 (5): 633--63. <https://doi.org/https://doi.org/10.1016/j.jbusvent.2005.02.010>.
+
+4.  Cyert, Richard Michael, and James G. March. 1963. A Behavioral Theory of the Firm. Prentice-Hall.
+
+5.  Hult, G.Tomas M., Robert F. Hurley, and Gary A. Knight. 2004. "Innovativeness: Its Antecedents and Impact on Business Performance." Industrial Marketing Management 33 (5): 429--38. <https://doi.org/https://doi.org/10.1016/j.indmarman.2003.08.015>.
+
+6.  Levitt, Barbara, and James G. March. 1988. "Organizational Learning." Annual Review of Sociology 14: 319--40. <http://www.jstor.org/stable/2083321>.
+
+7.  Marcati, Alberto, Gianluigi Guido, and Alessandro M Peluso. 2008. "The Role of SME Entrepreneurs' Innovativeness and Personality in the Adoption of Innovations." Research Policy 37 (9): 1579--90.
+
+8.  Martin, Frank, and Ronnie Smith. 2010. "What Is It That Entrepreneurs Learn from Experience?" Industry and Higher Education 24 (6): 505--12. <https://doi.org/10.5367/ihe.2010.0016>.
+
+9.  McKenny, Aaron F., Herman Aguinis, Jeremy C. Short, and Aaron H. Anglin. 2018. "What Doesn't Get Measured Does Exist: Improving the Accuracy of Computer-Aided Text Analysis." Journal of Management 44 (September): 2909--33. <https://doi.org/10.1177/0149206316657594>.
+
+10. Parker, Simon C. 2013. "Do Serial Entrepreneurs Run Successively Better-Performing Businesses?" Journal of Business Venturing 28 (5): 652--66. <https://doi.org/https://doi.org/10.1016/j.jbusvent.2012.08.001>.
+
+11. Vaillant, Yancy, and Esteban Lafuente. 2019. "Entrepreneurial Experience and the Innovativeness of Serial Entrepreneurs." Management Decision 57 (November): 2869--89. <https://doi.org/10.1108/MD-06-2017-0592>.
+:::
 
 the bib.tex file can go here. I have not yet added any references, but as we write they will be added.
