@@ -480,12 +480,13 @@ It was also shown that Kickstarter entrepreneurs tend towards being less innovat
 
 This contradictory nature of becoming more experienced to achieve success, causing less innovativness that saturates the market one tries to be successful in creates an interesting room for discussion about where the balance between experience and innovativeness lies as to retain uniqueness and at the same time be successful. This is because a study by Hult [@HULT] found that innovativeness improves performance of businesses and is thus an aspect businesses must retain. It is therefore of interest to future research to study experience and innovativeness to see if balance is necessary, or if one of these two aspects supersedes the other.
 
-What did we learn from what you found in your results, how do those findings relate to the ongoing debate in literature, and what can practitioners learn from that?
-
 ### Limitations
 
--   Doing an innovative project may take more time to complete (the campaigns may be equally long, but building the product may take longer). This means that entrepreneurs that are more likely to do innovative projects will have done fewer projects in total. This means that projects with a lot of previous projects are almost all not innovative. This creates biases in our dataset.
--   There are only few entrepreneurs with over 20 projects. This may mean that the results for higher numbers of previous projects are not representative.
+The study of the first research question in this project was limited by the fact that there aren't many people who back a large amount of projects and are creators of projects at the same time. This means that the data gets skewed, and not many creators make it past backing 10 other projects, meaning that it is difficult to measure indirect experience. Similarly, most creators don't make many projects, the great majority making just 1 project. This again produces biases in the data as we can't say that there are many experienced users. An attempt to mitigate this was attempted through the use of generalized linear models such as the poisson linear model and the gamma linear model as these account for right skewed distributions.
+
+In regards to the second research question it is important to consider that an innovative project may take more time to complete as building the product may take longer, regardless of what the campaign duration is. This means that entrepreneurs that are more likely to do innovative projects will have done fewer projects in total, and on the contrary creators with a lot of previous projects are almost all not innovative. This also produces biases in the data set, and given that the Kickstarter data set doesn't contain data on how long it takes for the product to be launched after the pledge goal is reached, more information is needed for an improvement to be made.
+
+The fact that very few creators make a large amount of projects is also a limitation for the second research question given that it looks at the number of previous successes. Therefore, if there isn't a representative enough sample of creators that made a large amount of projects the data set contains a bias. This bias affects the results of the model and must be considered when viewing the results provided by the models that were created.
 
 ## Conclusion (?)
 
