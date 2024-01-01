@@ -488,9 +488,9 @@ In regards to the second research question it is important to consider that an i
 
 The fact that very few creators make a large amount of projects is also a limitation for the second research question given that it looks at the number of previous successes. Therefore, if there isn't a representative enough sample of creators that made a large amount of projects the data set contains a bias. This bias affects the results of the model and must be considered when viewing the results provided by the models that were created.
 
-## Conclusion (?)
+## Conclusion
 
-The description did not say a conclusion was needed, but I think it is a good idea to have one.
+In conclusion this report set out to answer questions about whether or not experience impacts entrepreneurs in regards to success and to innovativeness. The results show that experience is a positive predictor of success, but a negative predictor of innovativeness. The results regarding success suggest that further research needs to be made in order to conclusively decide whether this is the case of entrepreneurs as a whole and not just in Kickstarter. The results regarding innovativeness suggest that research can be made in order to see what the trade off between experience and innovativeness is, and how to maximize the success of a business by taking this into account.
 
 ## References
 
