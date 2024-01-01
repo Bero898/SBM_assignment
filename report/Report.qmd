@@ -10,12 +10,18 @@ bibliography: references.bib
 
 ## Introduction
 
-Introduce the topic, explain why it is interesting (the research gap and the practical relevance), and formulate the research question.\
-Note from Thomas: Better to introduce the two research questions here already.
+Kickstarter is a crowdfunding platform where creators can share their ideas for a product or service to bring it to life. Creators can set a pledge goal, which they believe will ensure that the project will be a success; other users can pledge money. Creators have several ways to attract donators, for instance they could promise perks to those who donate, they could promise an improved product depending on the amount reached, and they could be more transparent about progress. Creating a successful project on this site might be considered a matter of luck to many; however, with the availability of a data set of this platform, it is possible to study a factor that could influence the success of a project.
+
+Creators in Kickstarter can be seen as entrepreneurs of a business with the goal of providing a product or a service. Thus, an organizational framework can be used to see what factors are at play in determining a project's success. The behavioral theory of the firm is one such framework, and it allows for the study of how learning affects the firm [@cyert1963]. It is commonly believed that more experience leads to a better chance of success for a business [@Levitt][@PARKER], however there are those who argue against this notion [@blank], resulting in a contradicting literature. It is also interesting to study how experience affects the way that creators change their ideas, more specifically if their ideas become more or less innovative as they become more experienced (try to cite something, if tihs part needs to be changed it would be good if Bram could take a look to perhaps connect it to the Research Question 2 section).
+
+For this purpose, the following research questions were formulated:
 
 RQ1: How does experience impact the success rate?
 
 RQ2: How do business ideas change after experience?
+
+Introduce the topic, explain why it is interesting (the research gap and the practical relevance), and formulate the research question.\
+Note from Thomas: Better to introduce the two research questions here already.
 
 Second note: Just use the motivation slide from the presentation for why it is relevant.
 
@@ -125,36 +131,37 @@ dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_backed %in% names(quan_table2),]
 #drop nan and inf values in dataHyp1_2
 dataHyp1_2 <- dataHyp1_2[complete.cases(dataHyp1_2),]
 
-hist(as.numeric(dataHyp1_2$Creator_nb_projects), main = 'Histogram of Number of Projects Created (learning)')
+hist(as.numeric(dataHyp1_2$Creator_nb_projects), main = 'Histogram of Number of Projects Created (learning)', xlab = 'Number of Projects Created')
 
 
 
 ```
 
 ```{r}
-hist(as.numeric(dataHyp1_2$Creator_nb_backed), main = 'Histogram of Number of Projects Backed (learning)')
+hist(as.numeric(dataHyp1_2$Creator_nb_backed), main = 'Histogram of Number of Projects Backed (learning)', xlab = 'Number of Projects Backed')
 ```
 
 ```{r}
-hist(dataHyp1_2$Goal_percentage, main = 'Histogram of the Percentage of the Goal that was reached (success)')
+hist(dataHyp1_2$Goal_percentage, main = 'Histogram of the Percentage of the Goal Reached (success)', xlab = 'Percentage of Goal Reached')
 ```
 
-Next we check the distribution of the success proxy. We notice that it is not normal, so a couple of transformations are tried. First Log(x+1) is tried, given that 0% is still viable, this shift is necessary to avoid undefined values. Next sqrt(Log(x+1)) is applied, but even though it is better, with the QQ-plots below we notice that it is still not normally distributed. The first QQ-plot corresponds to Log(x+1) and the second is for sqrt(Log(x+1)). Therefore a Linear Regression model cannot be used.
+The above figure shows that the success proxy, the percentage of the Kickstarter goal that was reached, is not normal, so a couple of transformations are tried, as for linear regression a normal outcome variable is required. First Log(x+1) is tried, given that 0% is still viable, this shift is necessary to avoid undefined values. Next sqrt(Log(x+1)) is applied, but even though it is better, with the QQ-plots below we notice that it is still not normally distributed. The first QQ-plot corresponds to Log(x+1) and the second is for sqrt(Log(x+1)). Therefore a Linear Regression model cannot be used.
 
 ```{r}
 x<-dataHyp1_2$Goal_percentage
-##check the distribution of the outcome variable
-hist(x)
-table(x)
 #looks exponential, so we try log transform
 y<-log(dataHyp1_2$Goal_percentage+1)
 qqnorm(y)
 qqline(y)
+
+
+```
+
+```{r}
 #still skewed, so we try to include sqrt transform
 y<-sqrt(log(dataHyp1_2$Goal_percentage+1))
 qqnorm(y)
 qqline(y)
-
 ```
 
 ### Regression and Anova test, research question 1
@@ -208,12 +215,6 @@ inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
 modelZeroINFL_2 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
 summary(modelZeroINFL)
 
-##will need to do stargazer for this
-
-
-stargazer::stargazer(list(Anova_normal, Anova_log), type = 'text')
-
-#table output both Anova_normal and Anova_log inline using stargazer
 ```
 
 ### Some more cleaning and barplot creation
