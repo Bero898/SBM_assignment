@@ -20,11 +20,6 @@ RQ1: How does experience impact the success rate?
 
 RQ2: How do business ideas change after experience?
 
-Introduce the topic, explain why it is interesting (the research gap and the practical relevance), and formulate the research question.\
-Note from Thomas: Better to introduce the two research questions here already.
-
-Second note: Just use the motivation slide from the presentation for why it is relevant.
-
 ## Theory and Hypotheses
 
 The Behavioural Theory of the Firm theorizes how organisations operate based on coallitions of various participants. Each participant has their own goals and aspirations, and the firm's behaviour as a whole is a result of the equilibrium reached by the choices of the individuals, bargaining process between those individuals, and the selections they make [@cyert1963] [@Levitt].
@@ -59,7 +54,7 @@ Describe the data set that you used, the way you translated the raw data into va
 
 ```{r}
 getwd()
-setwd("C:/Users/Borna/Documents/Study/Masters/Master A/Strategy and Business Models/SBM_assignment/report")
+setwd("C:/Users/bvits/OneDrive/Desktop/2023/Masters/JADs/strat bm/Project/SBM_assignment/report")
 getwd()
 ```
 
@@ -203,82 +198,17 @@ null_values_per_column <- sapply(inflDS, function(x) any(is.na(x)))
 # Print the result
 
 ##doesn't converge
-modelZeroINFL_1 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
+#modelZeroINFL_1 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
 
 ##try to remove skeweness by ignoring certain values (between 0 an 1, to avoid having too much data)
 
-inflDS<- inflDS[!(inflDS$`dataHyp1_2$Goal_percentage` > 0 & inflDS$`dataHyp1_2$Goal_percentage` < 1), ]
-inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
+#inflDS<- inflDS[!(inflDS$`dataHyp1_2$Goal_percentage` > 0 & inflDS$`dataHyp1_2$Goal_percentage` < 1), ]
+#inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
 
 
 ##doesn't converge either
-modelZeroINFL_2 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
-summary(modelZeroINFL)
-
-```
-
-### Some more cleaning and barplot creation
-
-```{r}
-#return the values of the loop in a vector
-vec_val <- c()
-vec_ind <- c()
-vec_amount <- c()
-
-for (i in 1:as.integer(max(dataHyp1$Creator_nb_projects))){
-  vec_val[i] <- sum(dataHyp1$Goal_met[dataHyp1$Creator_nb_projects == i])/length(dataHyp1$Goal_met[dataHyp1$Creator_nb_projects == i])
-  vec_ind[i] <- i
-  vec_amount[i] <- length(dataHyp1$Goal_met[dataHyp1$Creator_nb_projects == i])
-}
-
-#create a table of vec_val and vec_ind as two columns with headers: index and percentage
-tableHyp1 <- data.frame(vec_ind, vec_val, vec_amount)
-tableHyp1
-
-
-
-```
-
-```{r}
-#make a barplot of the column vec_amount
-barplot(tableHyp1$vec_amount, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Number of projects of the creator", main = "Number of projects of the creator by number of projects of the creator")
-
-```
-
-```{r}
-
-
-#drop columns where nan exists
-tableHyp1 <- tableHyp1[complete.cases(tableHyp1),]
-# tableHyp1
-
-
-#make a barchart of tableHyp1
-barplot(tableHyp1$vec_val, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Percentage of projects that met their goal", main = "Percentage of projects that met their goal by number of projects of the creator")
-
-
-```
-
-```{r}
-#make a barchart of the number of projects per number of projects
-barplot(tableHyp1$vec_amount, names.arg = tableHyp1$vec_ind, xlab = "Number of projects", ylab = "Number of projects of the creator", main = "Number of projects of the creator by number of projects of the creator")
-
-
-```
-
-```{r}
-
-# Convert the data to numeric if needed
-dataHyp1$Creator_nb_projects <- as.numeric(dataHyp1$Creator_nb_projects)
-
-# Check if 'tableHyp1$vec_ind' is numeric or convert it
-tableHyp1$vec_ind <- as.numeric(tableHyp1$vec_ind)
-
-# Now, create the barplot
-barplot(dataHyp1$Creator_nb_projects, names.arg = tableHyp1$vec_ind, xlab = "x", ylab = "y", main = "title")
-
-#this code raises an error. 
-
+#modelZeroINFL_2 <- pscl::zeroinfl(percent_int ~ . - `dataHyp1_2$Goal_percentage` | . - `dataHyp1_2$Goal_percentage`, dist = "geometric", data = inflDS, control = pscl::zeroinfl.control(maxit = 100000))
+#summary(modelZeroINFL)
 
 ```
 
@@ -517,5 +447,3 @@ In conclusion, this report set out to answer questions about whether or not expe
 
 11. Vaillant, Yancy, and Esteban Lafuente. 2019. "Entrepreneurial Experience and the Innovativeness of Serial Entrepreneurs." Management Decision 57 (November): 2869--89. <https://doi.org/10.1108/MD-06-2017-0592>.
 :::
-
-the bib.tex file can go here. I have not yet added any references, but as we write they will be added.
