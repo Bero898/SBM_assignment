@@ -2,7 +2,7 @@
 title: "SBM Report Group 4"
 format: pdf
 editor: visual
-author: "Bram, Diego, Roland, Thomas, Borná"
+author: "Bram Kapteijns, Diego van den Hoeven, Roland Vits, Thomas Boot, Borná Djavdan"
 bibliography: references.bib
 ---
 
