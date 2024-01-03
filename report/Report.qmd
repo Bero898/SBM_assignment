@@ -513,3 +513,7 @@ In conclusion, this report set out to answer questions about whether or not expe
 
 11. Vaillant, Yancy, and Esteban Lafuente. 2019. "Entrepreneurial Experience and the Innovativeness of Serial Entrepreneurs." Management Decision 57 (November): 2869--89. <https://doi.org/10.1108/MD-06-2017-0592>.
 :::
+
+## Appendix
+
+The github can be accessed through the following link: https://github.com/Bero898/SBM_assignment.git
