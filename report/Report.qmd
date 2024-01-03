@@ -1,6 +1,6 @@
 ---
 title: "SBM Report Group 4"
-format: html
+format: pdf
 editor: visual
 author: "Bram, Diego, Roland, Thomas, Borná"
 bibliography: references.bib
@@ -65,11 +65,12 @@ In order to test the first hypothesis it is necessary to first clean the data. T
 ```{r}
 #inspect the data
 #load .rds file named "info" into rstudio
-
-
+info32<-readRDS('info.rds')
 
 #create new data with only a few columns of info32 dataset
-dataHyp1Sub <- info32[,c('Goal_USD','Pledge_USD','Launched_at','Deadline', 'Creator_nb_projects', 'Creator_nb_backed')]
+dataHyp1Sub <- info32[,c('Goal_USD','Pledge_USD','Launched_at',
+                         'Deadline', 'Creator_nb_projects', 
+                         'Creator_nb_backed')]
 #dataHyp1Sub
 
 #make a subdataset where deadline is before week 32 in 2019 in unix time
@@ -94,11 +95,13 @@ dataHyp1$Goal_percentage[dataHyp1$Goal_percentage>100] = 100
 #dataHyp1
 
 #Get from Creator_nb_backed only the number with a regex
-dataHyp1$Creator_nb_backed <- gsub("[^0-9]", "", dataHyp1$Creator_nb_backed) #Seeing if this works better as a string rather than
+dataHyp1$Creator_nb_backed <- gsub("[^0-9]", "", dataHyp1$Creator_nb_backed)
+#Seeing if this works better as a string rather than an integer
 #dataHyp1
 
 #drop redundant columns
-dataHyp1 <- dataHyp1[,c('Creator_nb_projects', 'Creator_nb_backed', 'Goal_percentage')]
+dataHyp1 <- dataHyp1[,c('Creator_nb_projects', 'Creator_nb_backed', 
+                        'Goal_percentage')]
 
 
 #Drop the rows where nan values occur
@@ -107,11 +110,13 @@ dataHyp1 <- dataHyp1[complete.cases(dataHyp1),]
 
 #to find an appropriate cutoff point:
 
-# we will only use values with at least 50 records, because for normal distribution you need a minimum of 50 values
+# we will only use values with at least 50 records, 
+# because for normal distribution you need a minimum of 50 values
 # So then you have an substantial amount of values
 
 
-#iterate over the values of the following table: table(dataHyp1$Creator_nb_projects)
+#iterate over the values of the following table: 
+#table(dataHyp1$Creator_nb_projects)
 quan_table1 = table(dataHyp1$Creator_nb_projects)
 quan_table2 = table(dataHyp1$Creator_nb_backed)
 
@@ -126,18 +131,24 @@ dataHyp1_2 <- dataHyp1[dataHyp1$Creator_nb_backed %in% names(quan_table2),]
 #drop nan and inf values in dataHyp1_2
 dataHyp1_2 <- dataHyp1_2[complete.cases(dataHyp1_2),]
 
-hist(as.numeric(dataHyp1_2$Creator_nb_projects), main = 'Histogram of Number of Projects Created (learning)', xlab = 'Number of Projects Created')
+hist(as.numeric(dataHyp1_2$Creator_nb_projects), 
+     main = 'Histogram of Number of Projects Created (learning)', 
+     xlab = 'Number of Projects Created')
 
 
 
 ```
 
 ```{r}
-hist(as.numeric(dataHyp1_2$Creator_nb_backed), main = 'Histogram of Number of Projects Backed (learning)', xlab = 'Number of Projects Backed')
+hist(as.numeric(dataHyp1_2$Creator_nb_backed),
+     main = 'Histogram of Number of Projects Backed (learning)', 
+     xlab = 'Number of Projects Backed')
 ```
 
 ```{r}
-hist(dataHyp1_2$Goal_percentage, main = 'Histogram of the Percentage of the Goal Reached (success)', xlab = 'Percentage of Goal Reached')
+hist(dataHyp1_2$Goal_percentage, 
+     main = 'Histogram of the Percentage of the Goal Reached (success)',
+     xlab = 'Percentage of Goal Reached')
 ```
 
 The above figure shows that the success proxy, the percentage of the Kickstarter goal that was reached, is not normal, so a couple of transformations are tried, as for linear regression a normal outcome variable is required. First Log(x+1) is tried, given that 0% is still viable, this shift is necessary to avoid undefined values. Next sqrt(Log(x+1)) is applied, but even though it is better, with the QQ-plots below we notice that it is still not normally distributed. The first QQ-plot corresponds to Log(x+1) and the second is for sqrt(Log(x+1)). Therefore a Linear Regression model cannot be used.
@@ -169,12 +180,17 @@ Given that the data is not normally distributed, and the tested transformations 
 ##try Gamma distribution
 
 dataHyp1_2$nonzero_percentage <- dataHyp1_2$Goal_percentage + 1e-6
-modelGamma  <- glm(nonzero_percentage ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = Gamma(link = 'identity'))
+modelGamma  <- glm(nonzero_percentage ~ Creator_nb_projects + 
+                     Creator_nb_backed, 
+                   data = dataHyp1_2,family = 
+                     Gamma(link = 'identity'))
 
 dataHyp1_2$Goal_percentage_int <- as.integer(round(dataHyp1_2$Goal_percentage,0))
 ##poisson distribution int
 
-modelPoissonInt <- glm(Goal_percentage_int ~ Creator_nb_projects + Creator_nb_backed, data = dataHyp1_2,family = poisson(link = 'log'))
+modelPoissonInt <- glm(Goal_percentage_int ~ Creator_nb_projects + Creator_nb_backed, 
+                       data = dataHyp1_2,
+                       family = poisson(link = 'log'))
 
 
 # trying zero inflation model
@@ -182,18 +198,21 @@ modelPoissonInt <- glm(Goal_percentage_int ~ Creator_nb_projects + Creator_nb_ba
 
 
 
-hot_encode <- model.matrix(~  Creator_nb_projects + Creator_nb_backed  - 1, data = dataHyp1_2)
+hot_encode <- model.matrix(~  Creator_nb_projects + Creator_nb_backed  - 1, 
+                           data = dataHyp1_2)
 
 hot_encode<-as.data.frame(hot_encode)
 
 ##can't use non integer values for the dependent variable
 
-inflDS <- cbind(dataHyp1_2$Goal_percentage, hot_encode)
+inflDS <- cbind(dataHyp1_2$Goal_percentage, 
+                hot_encode)
 
 #don't run this if the second zeroinfl will be runned (it will cause issues with removing values to try to avoid skeweness)
 inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
 
-null_values_per_column <- sapply(inflDS, function(x) any(is.na(x)))
+null_values_per_column <- sapply(inflDS, 
+                                 function(x) any(is.na(x)))
 
 # Print the result
 
@@ -230,7 +249,11 @@ info <- readRDS(info_filename)
 #create a dataset with only creator_slug that appear more than once in the dataset
 dataHyp2Double <- info[info$creator_slug %in% names(which(table(info$creator_slug) > 1)),]
 
-dataHyp2sub<- dataHyp2Double[,c('creator_slug','Goal_USD','Pledge_USD','Launched_at','Deadline','Project_description','Creator_nb_projects','Creator_nb_backed', 'Category')]
+dataHyp2sub<- dataHyp2Double[,c('creator_slug','Goal_USD',
+                                'Pledge_USD','Launched_at',
+                                'Deadline','Project_description',
+                                'Creator_nb_projects','Creator_nb_backed', 
+                                'Category')]
 
 dataHyp2filtered <- na.omit(dataHyp2sub)
 
@@ -243,7 +266,9 @@ dataHyp2$Pledge_USD <- log(as.numeric(dataHyp2$Pledge_USD) + 1)
 dataHyp2$Goal_USD <- log(as.numeric(dataHyp2$Goal_USD) + 1)
 dataHyp2$success_rate <- dataHyp2$Pledge_USD / dataHyp2$Goal_USD
 
-dataHyp2 <- subset(dataHyp2, is.finite(dataHyp2$Pledge_USD) & is.finite(dataHyp2$Goal_USD) & is.finite(dataHyp2$success_rate))
+dataHyp2 <- subset(dataHyp2, is.finite(dataHyp2$Pledge_USD) 
+                   & is.finite(dataHyp2$Goal_USD) 
+                   & is.finite(dataHyp2$success_rate))
 
 # make a new column with order which orders the projects per creator_slug based on launched_at.
 # So the first project of a creator should get 1, the second 2 ..
@@ -294,16 +319,32 @@ mod3 <- lm(innovation ~ duration, data=dataHyp2)
 mod4 <- lm(innovation ~ previousSuccess, data=dataHyp2)
 mod5 <- lm(innovation ~ Category, data=dataHyp2)
 
-modA <- lm(innovation ~ Order + Goal_USD + duration, data=dataHyp2)
-modB <- lm(innovation ~ orderFactor + Goal_USD + duration, data=dataHyp2)
-modC <- lm(innovation ~ Order + Goal_USD + duration + previousSuccess, data=dataHyp2)
-modD <- lm(innovation ~ orderFactor + Goal_USD + duration + previousSuccess, data=dataHyp2)
-modE <- lm(innovation ~ Order + Goal_USD + duration + previousSuccess + previousSuccess * Order, data=dataHyp2)
-modF <- lm(innovation ~ orderFactor + Goal_USD + duration + previousSuccess * orderFactor, data=dataHyp2)
-modG <- lm(innovation ~ Order + Goal_USD + duration + previousSuccess + previousSuccess * Order + Category, data=dataHyp2)
-modH <- lm(innovation ~ orderFactor + Goal_USD + duration + previousSuccess * orderFactor + Category, data=dataHyp2)
+modA <- lm(innovation ~ Order + Goal_USD + 
+             duration, data=dataHyp2)
+modB <- lm(innovation ~ orderFactor + Goal_USD + 
+             duration, data=dataHyp2)
+modC <- lm(innovation ~ Order + Goal_USD + 
+             duration + previousSuccess, 
+           data=dataHyp2)
+modD <- lm(innovation ~ orderFactor + Goal_USD + 
+             duration + previousSuccess, 
+           data=dataHyp2)
+modE <- lm(innovation ~ Order + Goal_USD + 
+             duration + previousSuccess + 
+             previousSuccess * Order, 
+           data=dataHyp2)
+modF <- lm(innovation ~ orderFactor + Goal_USD + 
+             duration + previousSuccess * orderFactor
+           , data=dataHyp2)
+modG <- lm(innovation ~ Order + Goal_USD + duration +
+             previousSuccess + previousSuccess * Order
+           + Category, data=dataHyp2)
+modH <- lm(innovation ~ orderFactor + Goal_USD + duration +
+             previousSuccess * orderFactor + Category, 
+           data=dataHyp2)
 
-texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, mod5, modA, modB, modC, modD, modE, modF, modG, modH))
+texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, mod5, modA, 
+                       modB, modC, modD, modE, modF, modG, modH))
 texreg::screenreg(list(mod0, mod2, mod3, mod4, modA, modC, modE))
 ```
 
@@ -315,28 +356,49 @@ Besides fitting a linear model, we also made graphs showing the impact of having
 dataHyp2 <- dataHyp2 %>%
   arrange(creator_slug, Order) %>%  # Sort the dataframe by 'id' and 'order'
   group_by(creator_slug) %>%
-  mutate(change = innovation - lag(innovation, default = first(innovation)))
+  mutate(change = innovation - 
+           lag(innovation, default = first(innovation)))
 
+
+```
+
+```{r}
 dataHyp2 %>% ggplot(aes(x=factor(Order), y=change)) +
   geom_boxplot() +
-  geom_line(stat="summary", fun="mean", aes(group=1, y=innovation), color="red", size=1) +
+  geom_line(stat="summary", fun="mean",
+            aes(group=1, y=innovation),
+            color="red", size=1) +
   labs(title="Change in innovation for number of projects",
        x="Number of projects",
        y="Change in innovation compared to time-1")
 
-ggplot(dataHyp2, aes(x = Order, y = change)) +
-  geom_bar(stat = "summary", fun = "mean", position = "dodge") +
-  labs(title = "Mean change in innovation for number of projects", x = "Number of projects", y = "Innovation")
 
+```
+
+```{r}
+ggplot(dataHyp2, aes(x = Order, y = change)) +
+  geom_bar(stat = "summary", fun = "mean", 
+           position = "dodge") +
+  labs(title = "Mean change in innovation for number of projects", 
+       x = "Number of projects", y = "Innovation")
+
+
+```
+
+```{r}
 dataHyp2 %>% ggplot(aes(x=factor(Order), y=innovation)) +
   geom_boxplot() +
   labs(title="Innovation for number of projects",
        x="Number of projects",
        y="Innovation")
 
+```
+
+```{r}
 ggplot(dataHyp2, aes(x = Order, y = innovation)) +
   geom_bar(stat = "summary", fun = "mean", position = "dodge") +
-  labs(title = "Mean innovation for number of projects", x = "Number of projects", y = "Innovation")
+  labs(title = "Mean innovation for number of projects",
+       x = "Number of projects", y = "Innovation")
 ```
 
 ## Results
