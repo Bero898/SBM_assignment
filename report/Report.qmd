@@ -50,7 +50,7 @@ Lastly, it is not assumed that employees influence business results, as we are t
 
 ## Methods and Data
 
-Describe the data set that you used, the way you translated the raw data into variables, and the methods you used to analyze the data (e.g., cluster analysis, regression analysis, panel data analysis, time series). Remember that most methods have a number of assumptions that you have to check prior to doing the analyses. Certain assumption violations can be fixed by transforming the focal variables, e.g., the dependent variable, in case of other violations you may need to choose a different method.
+Describe the data set that you used, the way you translated the raw data into variables, and the methods you used to analyze the data (e.g., cluster analysis, regression analysis, panel data analysis, time series). Remember that most methods have a number of assumptions that you have to check prior to doing the analyses. Certain assumption violations can be fixed by transforming the focal variables, e.g., the dependent variable, in case of other violations you may need to choose a different method
 
 ```{r}
 getwd()
@@ -345,6 +345,10 @@ modH <- lm(innovation ~ orderFactor + Goal_USD + duration +
 
 texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, mod5, modA, 
                        modB, modC, modD, modE, modF, modG, modH))
+
+```
+
+```{r}
 texreg::screenreg(list(mod0, mod2, mod3, mod4, modA, modC, modE))
 ```
 
