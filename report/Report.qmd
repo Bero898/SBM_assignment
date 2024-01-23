@@ -54,7 +54,7 @@ Describe the data set that you used, the way you translated the raw data into va
 
 ```{r}
 getwd()
-setwd("C:/Users/bvits/OneDrive/Desktop/2023/Masters/JADs/strat bm/Project/SBM_assignment/report")
+#setwd("C:/Users/bvits/OneDrive/Desktop/2023/Masters/JADs/strat bm/Project/SBM_assignment/report")
 getwd()
 ```
 
@@ -428,6 +428,10 @@ anova(modelPoissonInt)
 
 ```
 
+```{r}
+stargazer::stargazer(anova(modelPoissonInt), title = "Research Question 1: Poisson Model", align = TRUE)
+```
+
 In the analysis of deviance table we notice that the inclusion of the number of projects backed reduces the deviance by a large margin, this justifies including these variables in the model, as it results in a better model.
 
 ```{r}
@@ -440,6 +444,10 @@ For this model, we notice that the coefficients are not mostly significant in th
 ```{r}
 #Anova Gamma
 anova(modelGamma)
+```
+
+```{r}
+stargazer::stargazer(anova(modelGamma), title = "Research Question 1: Gamma Model", align = TRUE)
 ```
 
 In this second analysis of deviance table, a similar effect is noticed to the previous, including the number of projects backed improves the model by reducing the deviance, which suggests that it's a good variable for the model. Therefore we can say that the success is not just explained by the experience one gains by doing more projects, but also observing the projects of others.
