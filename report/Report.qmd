@@ -84,14 +84,22 @@ dataHyp1 <- dataHyp1Sub[dataHyp1Sub$Deadline < 1565474400,]
 dataHyp1$Pledge_USD <- as.integer(dataHyp1$Pledge_USD)
 dataHyp1$Goal_USD <- as.integer(dataHyp1$Goal_USD)
 
+#Remove NAs
+
+dataHyp3<- na.omit(dataHyp1)
+
+
 #drop the rows where Goal_USD is 0 -> then you might get inf percentage
 dataHyp1 <- dataHyp1[dataHyp1$Goal_USD != 0,]
 #dataHyp1
 
 #Create a new column with percentage of goal reached
-dataHyp1$Goal_percentage <- dataHyp1$Pledge_USD/dataHyp1$Goal_USD
+dataHyp1$Goal_percentage <- (dataHyp1$Pledge_USD/dataHyp1$Goal_USD)*100
 dataHyp1$Goal_percentage <- round(dataHyp1$Goal_percentage, digits = 3)
 dataHyp1$Goal_percentage[dataHyp1$Goal_percentage>100] = 100
+
+table(dataHyp1$Goal_percentage[dataHyp1$Goal_percentage == 100])
+
 #dataHyp1
 
 #Get from Creator_nb_backed only the number with a regex
@@ -137,6 +145,7 @@ hist(as.numeric(dataHyp1_2$Creator_nb_projects),
 
 
 
+
 ```
 
 ```{r}
@@ -175,22 +184,76 @@ qqline(y)
 Given that the data is not normally distributed, and the tested transformations are not satisfactory a linear regression is not appropriate. By looking at the previous histogram, we can asses that the data seems to be from an exponential distribution with an inflated 0 value. Therefore, Poisson regression Gamma regression, and zero inflated regression are tried. For poisson regression, we round the goal percentage to the nearest integer, given that the model works for discrete outcome variables. It is also important to note that the zero inflated value model did not converge, regardless of the preprocessing steps taken for this regression. The first step was hot-encoding the proxies for learning because the model doesn't take factors as inputs, then the percentages for the success were rounded to integers because the model only outputs integers. The possible reasons as to why this error still occured will be presented in the discussion section.
 
 ```{r}
+
+##LM
+modelLinear <- lm(Goal_percentage ~ Creator_nb_projects + 
+                     Creator_nb_backed, 
+                   data = dataHyp1_2)
+
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modelLinear, which = 1)  # Residuals vs Fitted
+plot(modelLinear, which = 2)  # Normal Q-Q plot
+plot(modelLinear, which = 3)  # Scale-Location plot
+plot(modelLinear, which = 4)  # Residuals vs Leverage
+
+
+```
+
+```{r}
+
+dataHyp1_2$Goal_percentage_logtransfromed<-log(dataHyp1_2$Goal_percentage+1)
+
+modelLinear2 <- lm(Goal_percentage_logtransfromed ~ Creator_nb_projects + 
+                     Creator_nb_backed, 
+                   data = dataHyp1_2)
+
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modelLinear2, which = 1)  # Residuals vs Fitted
+plot(modelLinear2, which = 2)  # Normal Q-Q plot
+plot(modelLinear2, which = 3)  # Scale-Location plot
+plot(modelLinear2, which = 4)  # Residuals vs Leverage
+
+
+```
+
+```{r}
+
+dataHyp1_2$Goal_percentage_sqrttransfromed<-sqrt(log(dataHyp1_2$Goal_percentage+1))
+
+modelLinear3 <- lm(Goal_percentage_sqrttransfromed ~ Creator_nb_projects + 
+                     Creator_nb_backed, 
+                   data = dataHyp1_2)
+
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modelLinear3, which = 1)  # Residuals vs Fitted
+plot(modelLinear3, which = 2)  # Normal Q-Q plot
+plot(modelLinear3, which = 3)  # Scale-Location plot
+plot(modelLinear3, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
 ##non integer
 
 ##try Gamma distribution
 
-dataHyp1_2$nonzero_percentage <- dataHyp1_2$Goal_percentage + 1e-6
-modelGamma  <- glm(nonzero_percentage ~ Creator_nb_projects + 
-                     Creator_nb_backed, 
-                   data = dataHyp1_2,family = 
-                     Gamma(link = 'identity'))
+# dataHyp1_2$nonzero_percentage <- dataHyp1_2$Goal_percentage + 1e-6
+# modelGamma  <- glm(nonzero_percentage ~ Creator_nb_projects + 
+#                      Creator_nb_backed, 
+#                    data = dataHyp1_2,family = 
+#                      Gamma(link = 'identity'))
 
-dataHyp1_2$Goal_percentage_int <- as.integer(round(dataHyp1_2$Goal_percentage,0))
-##poisson distribution int
 
-modelPoissonInt <- glm(Goal_percentage_int ~ Creator_nb_projects + Creator_nb_backed, 
+dataHyp1_2$Goal_reached<- as.integer(floor(dataHyp1_2$Goal_percentage*0.01))
+
+table(dataHyp1_2$Goal_reached)
+##logistic distribution
+
+modelLogistic <- glm(Goal_reached ~ Creator_nb_projects + Creator_nb_backed, 
                        data = dataHyp1_2,
-                       family = poisson(link = 'log'))
+                       family = binomial(link = 'logit'))
 
 
 # trying zero inflation model
@@ -198,21 +261,21 @@ modelPoissonInt <- glm(Goal_percentage_int ~ Creator_nb_projects + Creator_nb_ba
 
 
 
-hot_encode <- model.matrix(~  Creator_nb_projects + Creator_nb_backed  - 1, 
-                           data = dataHyp1_2)
-
-hot_encode<-as.data.frame(hot_encode)
+# hot_encode <- model.matrix(~  Creator_nb_projects + Creator_nb_backed  - 1, 
+#                            data = dataHyp1_2)
+# 
+# hot_encode<-as.data.frame(hot_encode)
 
 ##can't use non integer values for the dependent variable
 
-inflDS <- cbind(dataHyp1_2$Goal_percentage, 
-                hot_encode)
+# inflDS <- cbind(dataHyp1_2$Goal_percentage, 
+#                 hot_encode)
 
 #don't run this if the second zeroinfl will be runned (it will cause issues with removing values to try to avoid skeweness)
-inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
-
-null_values_per_column <- sapply(inflDS, 
-                                 function(x) any(is.na(x)))
+# inflDS$percent_int<- as.integer(round(inflDS$`dataHyp1_2$Goal_percentage`,0))
+# 
+# null_values_per_column <- sapply(inflDS, 
+#                                  function(x) any(is.na(x)))
 
 # Print the result
 
@@ -349,6 +412,137 @@ texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, mod5, modA,
 ```
 
 ```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(mod0, which = 1)  # Residuals vs Fitted
+plot(mod0, which = 2)  # Normal Q-Q plot
+plot(mod0, which = 3)  # Scale-Location plot
+plot(mod0, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(mod1, which = 1)  # Residuals vs Fitted
+plot(mod1, which = 2)  # Normal Q-Q plot
+plot(mod1, which = 3)  # Scale-Location plot
+plot(mod1, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(mod2, which = 1)  # Residuals vs Fitted
+plot(mod2, which = 2)  # Normal Q-Q plot
+plot(mod2, which = 3)  # Scale-Location plot
+plot(mod2, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(mod3, which = 1)  # Residuals vs Fitted
+plot(mod3, which = 2)  # Normal Q-Q plot
+plot(mod3, which = 3)  # Scale-Location plot
+plot(mod3, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(mod4, which = 1)  # Residuals vs Fitted
+plot(mod4, which = 2)  # Normal Q-Q plot
+plot(mod4, which = 3)  # Scale-Location plot
+plot(mod4, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(mod5, which = 1)  # Residuals vs Fitted
+plot(mod5, which = 2)  # Normal Q-Q plot
+plot(mod5, which = 3)  # Scale-Location plot
+plot(mod5, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modA, which = 1)  # Residuals vs Fitted
+plot(modA, which = 2)  # Normal Q-Q plot
+plot(modA, which = 3)  # Scale-Location plot
+plot(modA, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modB, which = 1)  # Residuals vs Fitted
+plot(modB, which = 2)  # Normal Q-Q plot
+plot(modB, which = 3)  # Scale-Location plot
+plot(modB, which = 4)  # Residuals vs Leverage
+
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modC, which = 1)  # Residuals vs Fitted
+plot(modC, which = 2)  # Normal Q-Q plot
+plot(modC, which = 3)  # Scale-Location plot
+plot(modC, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modD, which = 1)  # Residuals vs Fitted
+plot(modD, which = 2)  # Normal Q-Q plot
+plot(modD, which = 3)  # Scale-Location plot
+plot(modD, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modE, which = 1)  # Residuals vs Fitted
+plot(modE, which = 2)  # Normal Q-Q plot
+plot(modE, which = 3)  # Scale-Location plot
+plot(modE, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modF, which = 1)  # Residuals vs Fitted
+plot(modF, which = 2)  # Normal Q-Q plot
+plot(modF, which = 3)  # Scale-Location plot
+plot(modF, which = 4)  # Residuals vs Leverage
+
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modG, which = 1)  # Residuals vs Fitted
+plot(modG, which = 2)  # Normal Q-Q plot
+plot(modG, which = 3)  # Scale-Location plot
+plot(modG, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modH, which = 1)  # Residuals vs Fitted
+plot(modH, which = 2)  # Normal Q-Q plot
+plot(modH, which = 3)  # Scale-Location plot
+plot(modH, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
 texreg::screenreg(list(mod0, mod2, mod3, mod4, modA, modC, modE))
 ```
 
@@ -415,17 +609,14 @@ Given that the zero inflated model doesn't produce results, we proceed by studyi
 
 ```{r}
 ##Poisson summary
-summary(modelPoissonInt)
+summary(modelLogistic)
 
 
 ```
 
 From the results we see that most of the coefficients for both the number of backed projects and the number of projects created are significant. This suggests that the effects of the proxies we selected for learning are significant. In regards to the sign of the coefficients, we notice that none of the negative values are significant, with the exception of the intercept. Since the significant coefficients are positive, though small, we conclude that learning has a positive effect on success, which is in line with (find citation). In this case we don't notice an increasing pattern in of the coefficients, wherein more experience would have significantly higher values, as sometimes the coefficients decrease again.
 
-```{r}
-#Anova Poisson
-anova(modelPoissonInt)
-
+```{}
 ```
 
 ```{r}
@@ -434,17 +625,10 @@ stargazer::stargazer(anova(modelPoissonInt), title = "Research Question 1: Poiss
 
 In the analysis of deviance table we notice that the inclusion of the number of projects backed reduces the deviance by a large margin, this justifies including these variables in the model, as it results in a better model.
 
-```{r}
-#Sumary for Gamma model
-summary(modelGamma)
+```{}
 ```
 
-For this model, we notice that the coefficients are not mostly significant in the case of the number of projects created; contrastingly, the number of projects backed does have mostly significant values. It is also important to note that this Gamma distribution model has a lower AIC than the Poisson distribution model. We also notice that if the values are placed in increasing order of the amounts projects back and of the number of projects created there is an increase in the coefficients. This suggests that the more experience one has, the better they tend to perform. We also notice that the values that don't follow this tendency don't have significant p-values.
-
-```{r}
-#Anova Gamma
-anova(modelGamma)
-```
+For this model, we notice that the coefficients are not mostly significant in the case of the number of projects created; contrastingly, the number of projects backed does have mostly significant values. It is also important to note that this Gamma distribution model has a lower AIC than the Poisson distribution model. We also notice that if the values are placed in increasing order of the amounts projects back and of the number of projects created there is an increase in the coefficients. This suggests that the more experience one has, the better they tend to perform. We also notice that the values that don't follow this tendency don't have significant p-values
 
 ```{r}
 stargazer::stargazer(anova(modelGamma), title = "Research Question 1: Gamma Model", align = TRUE)
