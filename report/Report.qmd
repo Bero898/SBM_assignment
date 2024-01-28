@@ -376,39 +376,46 @@ The variables mentioned in the section discussing the importing and cleaning of 
 ```{r}
 
 mod0 <- lm(innovation ~ Order, data=dataHyp2)
-mod1 <- lm(innovation ~ orderFactor, data=dataHyp2)
-mod2 <- lm(innovation ~ Goal_USD, data=dataHyp2)
-mod3 <- lm(innovation ~ duration, data=dataHyp2)
-mod4 <- lm(innovation ~ previousSuccess, data=dataHyp2)
-mod5 <- lm(innovation ~ Category, data=dataHyp2)
+# mod1 <- lm(innovation ~ orderFactor, data=dataHyp2)
+mod1 <- lm(innovation ~ Goal_USD, data=dataHyp2)
+mod2 <- lm(innovation ~ duration, data=dataHyp2)
+mod3 <- lm(innovation ~ previousSuccess, data=dataHyp2)
+# mod5 <- lm(innovation ~ Category, data=dataHyp2)
 
 modA <- lm(innovation ~ Order + Goal_USD + 
              duration, data=dataHyp2)
-modB <- lm(innovation ~ orderFactor + Goal_USD + 
-             duration, data=dataHyp2)
+#modB <- lm(innovation ~ orderFactor + Goal_USD + 
+#             duration, data=dataHyp2)
+modB <- lm(innovation ~ Order + Goal_USD + 
+             duration + previousSuccess, 
+           data=dataHyp2)
+#modD <- lm(innovation ~ orderFactor + Goal_USD + 
+#             duration + previousSuccess, 
+#           data=dataHyp2)
 modC <- lm(innovation ~ Order + Goal_USD + 
-             duration + previousSuccess, 
-           data=dataHyp2)
-modD <- lm(innovation ~ orderFactor + Goal_USD + 
-             duration + previousSuccess, 
-           data=dataHyp2)
-modE <- lm(innovation ~ Order + Goal_USD + 
              duration + previousSuccess + 
              previousSuccess * Order, 
            data=dataHyp2)
-modF <- lm(innovation ~ orderFactor + Goal_USD + 
-             duration + previousSuccess * orderFactor
-           , data=dataHyp2)
-modG <- lm(innovation ~ Order + Goal_USD + duration +
-             previousSuccess + previousSuccess * Order
-           + Category, data=dataHyp2)
-modH <- lm(innovation ~ orderFactor + Goal_USD + duration +
-             previousSuccess * orderFactor + Category, 
-           data=dataHyp2)
+#modF <- lm(innovation ~ orderFactor + Goal_USD + 
+#             duration + previousSuccess * orderFactor
+#           , data=dataHyp2)
+#modG <- lm(innovation ~ Order + Goal_USD + duration +
+#             previousSuccess + previousSuccess * Order
+#           + Category, data=dataHyp2)
+#modH <- lm(innovation ~ orderFactor + Goal_USD + duration +
+#             previousSuccess * orderFactor + Category, 
+#           data=dataHyp2)
 
-texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, mod5, modA, 
-                       modB, modC, modD, modE, modF, modG, modH))
+#texreg::screenreg(list(mod0, mod1, mod2, mod3, mod4, mod5, modA, 
+#                       modB, modC, modD, modE, modF, modG, modH))
 
+texreg::screenreg(list(mod0, mod1, mod2, mod3))
+
+
+```
+
+```{r}
+texreg::screenreg(list(modA, modB, modC))
 ```
 
 ```{r}
@@ -450,24 +457,6 @@ plot(mod3, which = 4)  # Residuals vs Leverage
 ```{r}
 par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
 
-plot(mod4, which = 1)  # Residuals vs Fitted
-plot(mod4, which = 2)  # Normal Q-Q plot
-plot(mod4, which = 3)  # Scale-Location plot
-plot(mod4, which = 4)  # Residuals vs Leverage
-```
-
-```{r}
-par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
-
-plot(mod5, which = 1)  # Residuals vs Fitted
-plot(mod5, which = 2)  # Normal Q-Q plot
-plot(mod5, which = 3)  # Scale-Location plot
-plot(mod5, which = 4)  # Residuals vs Leverage
-```
-
-```{r}
-par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
-
 plot(modA, which = 1)  # Residuals vs Fitted
 plot(modA, which = 2)  # Normal Q-Q plot
 plot(modA, which = 3)  # Scale-Location plot
@@ -495,55 +484,7 @@ plot(modC, which = 4)  # Residuals vs Leverage
 ```
 
 ```{r}
-
-par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
-
-plot(modD, which = 1)  # Residuals vs Fitted
-plot(modD, which = 2)  # Normal Q-Q plot
-plot(modD, which = 3)  # Scale-Location plot
-plot(modD, which = 4)  # Residuals vs Leverage
-```
-
-```{r}
-
-par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
-
-plot(modE, which = 1)  # Residuals vs Fitted
-plot(modE, which = 2)  # Normal Q-Q plot
-plot(modE, which = 3)  # Scale-Location plot
-plot(modE, which = 4)  # Residuals vs Leverage
-```
-
-```{r}
-par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
-
-plot(modF, which = 1)  # Residuals vs Fitted
-plot(modF, which = 2)  # Normal Q-Q plot
-plot(modF, which = 3)  # Scale-Location plot
-plot(modF, which = 4)  # Residuals vs Leverage
-
-```
-
-```{r}
-par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
-
-plot(modG, which = 1)  # Residuals vs Fitted
-plot(modG, which = 2)  # Normal Q-Q plot
-plot(modG, which = 3)  # Scale-Location plot
-plot(modG, which = 4)  # Residuals vs Leverage
-```
-
-```{r}
-par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
-
-plot(modH, which = 1)  # Residuals vs Fitted
-plot(modH, which = 2)  # Normal Q-Q plot
-plot(modH, which = 3)  # Scale-Location plot
-plot(modH, which = 4)  # Residuals vs Leverage
-```
-
-```{r}
-texreg::screenreg(list(mod0, mod2, mod3, mod4, modA, modC, modE))
+# texreg::screenreg(list(mod0, mod2, mod3, mod4, modA, modC, modE))
 ```
 
 ### Plotting innovation graphs
@@ -603,29 +544,93 @@ ggplot(dataHyp2, aes(x = Order, y = innovation)) +
 
 ### Hypothesis 1 results
 
-#### Linear models
+#### Logistic model
 
-Given that the zero inflated model doesn't produce results, we proceed by studying the Poisson and Gamma models. First we look at the results for the Poisson Model.
+Given that the zero inflated model doesn't produce results, we proceed by studying the Poisson model. First we look at the results for the Poisson Model.
 
 ```{r}
-##Poisson summary
+##Logistic summary
 summary(modelLogistic)
 
 
 ```
 
+```{r}
+#summary(anova(modelLogistic))
+```
+
 From the results we see that most of the coefficients for both the number of backed projects and the number of projects created are significant. This suggests that the effects of the proxies we selected for learning are significant. In regards to the sign of the coefficients, we notice that none of the negative values are significant, with the exception of the intercept. Since the significant coefficients are positive, though small, we conclude that learning has a positive effect on success, which is in line with (find citation). In this case we don't notice an increasing pattern in of the coefficients, wherein more experience would have significantly higher values, as sometimes the coefficients decrease again.
 
-```{}
+```{r}
+library(plot3D)
+plot_probs <- function(model, var1, var2, n = 50, ...) {
+  nm1 <- deparse(substitute(var1))
+  nm2 <- deparse(substitute(var2))
+  df <- model.frame(model)
+  var1 <- df[[nm1]]
+  var2 <- df[[nm2]]
+  df <- df[-match(c(nm1, nm2), names(df))]
+  preds <- list(x = seq(min(var1), max(var1), length = n),
+                y = seq(min(var2), max(var2), length = n))
+  predlist <- setNames(c(preds, lapply(df, mean)), c(nm1, nm2, names(df)))
+  pred_df <- do.call("expand.grid", predlist)
+  Probability <- matrix(predict(model, newdata = pred_df, type = "response"), 
+                        nrow = n)
+  persp(x = preds$x, y = preds$y, z = Probability, xlab = nm1, ylab = nm2,
+        ticktype = "detailed", zlim = c(0, 1), ...)
+}
 ```
 
 ```{r}
-stargazer::stargazer(anova(modelPoissonInt), title = "Research Question 1: Poisson Model", align = TRUE)
+plot_probs(modelLogistic, Creator_nb_projects, Creator_nb_backed, theta = -60, phi = 30, col = "gold", cex.lab=0.7, cex.axis=0.6)
+```
+
+```{r}
+dataHyp1_2$Creator_nb_projects <- as.numeric(dataHyp1_2$Creator_nb_projects)
+dataHyp1_2$Creator_nb_backed <- as.numeric(dataHyp1_2$Creator_nb_backed)
+
+modelLogistic <- glm(Goal_reached ~ Creator_nb_projects + Creator_nb_backed, 
+                       data = dataHyp1_2,
+                       family = binomial(link = 'logit'))
+
+
+# Add predicted probabilities to your dataset
+dataHyp1_2$prob <- predict(modelLogistic, newdata = dataHyp1_2, type = "response")
+
+# Ensure all variables are numeric and remove any rows with NA values
+dataHyp1_2 <- na.omit(dataHyp1_2)
+
+# Now plot with plot3D::scatter3D
+plot3D::scatter3D(x = dataHyp1_2$Creator_nb_projects, 
+                  y = dataHyp1_2$Creator_nb_backed, 
+                  z = dataHyp1_2$prob, 
+                  xlab = "Number of Projects Created", 
+                  ylab = "Number of Projects Backed", 
+                  zlab = "Probability of Reaching Goal", 
+                  colvar = dataHyp1_2$prob, 
+                  col = rainbow(100), 
+                  pch = 19, 
+                  theta = -60, # Rotate horizontally
+                  phi = 30, # Rotate vertically
+                  cex.lab=0.4)    
+
+plot_probs(modelLogistic, Glucose, BMI, theta = 45, phi = 30, col = "gold")
+
+plot3D::slice3D(x = dataHyp1_2$Creator_nb_projects, y = dataHyp1_2$Creator_nb_backed, z = dataHyp1_2$prob, 
+                  facets = NA, 
+                  add = TRUE, 
+                  col = "lightblue", 
+                  alpha = 0.5)
+
+```
+
+```{r}
+stargazer::stargazer(anova(modelLogistic), title = "Research Question 1: Logistic Model", align = TRUE)
 ```
 
 In the analysis of deviance table we notice that the inclusion of the number of projects backed reduces the deviance by a large margin, this justifies including these variables in the model, as it results in a better model.
 
-```{}
+```         
 ```
 
 For this model, we notice that the coefficients are not mostly significant in the case of the number of projects created; contrastingly, the number of projects backed does have mostly significant values. It is also important to note that this Gamma distribution model has a lower AIC than the Poisson distribution model. We also notice that if the values are placed in increasing order of the amounts projects back and of the number of projects created there is an increase in the coefficients. This suggests that the more experience one has, the better they tend to perform. We also notice that the values that don't follow this tendency don't have significant p-values
