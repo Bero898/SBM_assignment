@@ -625,7 +625,7 @@ plot3D::slice3D(x = dataHyp1_2$Creator_nb_projects, y = dataHyp1_2$Creator_nb_ba
 ```
 
 ```{r}
-stargazer::stargazer(anova(modelLogistic), title = "Research Question 1: Logistic Model", align = TRUE)
+stargazer::stargazer(modelLogistic, title = "Research Question 1: Logistic Model", align = TRUE)
 ```
 
 In the analysis of deviance table we notice that the inclusion of the number of projects backed reduces the deviance by a large margin, this justifies including these variables in the model, as it results in a better model.
@@ -652,6 +652,13 @@ The hypothesis that was studied stated that the more experience one has, whether
 Let us first discuss the results from the linear models. Using a significance level of 0.05, which is justified since we are not dealing with a critical situation, we can see that in all linear models, the number of previous projects (the 'Order' term) has a significant effect on the innovation score of projects. We can also see that this effect is negative. This means that the more projects a creator has done, the less innovative a new project is expected to be. As said in the methods section, we also added the number of previous projects as a factor (the 'orderFactor' term). Without any control variables, we can see that as projects get more previous projects, the innovation score gets lower. However, after adding the control variables, the effect of 'orderFactor' was no longer determined to be significant.
 
 Comparing the models, it stands out that the 'category' term greatly increases the R-squared metric. We also see that a lot of categories significantly differ from the baseline category. We hypothesize that this means that some categories are more more likely to be innovative than others.
+
+```{r}
+#this will be the stargazer output of the second research question
+stargazer::stargazer(mod0, mod1, mod2, mod3, title = "Research Question 2: Model 0 to 3", align = TRUE)
+
+stargazer::stargazer(modA, modB, modC, title = "Research Question 2: Model 0 to 3", align = TRUE)
+```
 
 #### Plots
 
