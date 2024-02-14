@@ -389,9 +389,9 @@ modA <- lm(innovation ~ Order + Goal_USD +
 modB <- lm(innovation ~ Order + Goal_USD + 
              duration + previousSuccess, 
            data=dataHyp2)
-#modD <- lm(innovation ~ orderFactor + Goal_USD + 
-#             duration + previousSuccess, 
-#           data=dataHyp2)
+modD <- lm(innovation ~ orderFactor + Goal_USD + 
+             duration + previousSuccess, 
+           data=dataHyp2)
 modC <- lm(innovation ~ Order + Goal_USD + 
              duration + previousSuccess + 
              previousSuccess * Order, 
@@ -481,6 +481,15 @@ plot(modC, which = 1)  # Residuals vs Fitted
 plot(modC, which = 2)  # Normal Q-Q plot
 plot(modC, which = 3)  # Scale-Location plot
 plot(modC, which = 4)  # Residuals vs Leverage
+```
+
+```{r}
+par(mfrow = c(2,2), col.axis = "black", col.lab = "black", tck = 0)
+
+plot(modD, which = 1)  # Residuals vs Fitted
+plot(modD, which = 2)  # Normal Q-Q plot
+plot(modD, which = 3)  # Scale-Location plot
+plot(modD, which = 4)  # Residuals vs Leverage
 ```
 
 ```{r}
